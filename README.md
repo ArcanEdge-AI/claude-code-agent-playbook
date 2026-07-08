@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/claude-code-agent-playbook-hero.png" alt="Claude Code Agent Playbook hero banner" width="100%" />
+</p>
+
 <h1 align="center">Claude Code Agent Playbook</h1>
 
 <p align="center">
@@ -234,6 +238,8 @@ references/subagents.md
 ├── INSTALL.md
 ├── LICENSE
 ├── README.md
+├── assets/
+│   └── claude-code-agent-playbook-hero.png
 ├── agents/
 │   ├── docs-researcher.md
 │   ├── isolated-worker.md
