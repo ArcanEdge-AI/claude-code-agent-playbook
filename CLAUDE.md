@@ -31,4 +31,4 @@ This repo is mostly Markdown, with a small set of YAML frontmatter blocks in ski
 
 ## License
 
-No license has been selected yet. Do not add a license unless the user explicitly chooses one.
+MIT (see `LICENSE`). Do not change the license without an explicit maintainer decision.

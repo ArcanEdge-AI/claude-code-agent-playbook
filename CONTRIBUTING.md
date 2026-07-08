@@ -47,4 +47,4 @@ Before opening a PR:
 
 ## License Note
 
-No license has been selected yet. Do not add a license without an explicit maintainer decision.
+This project is MIT licensed (see `LICENSE`). Contributions are accepted under the same license.

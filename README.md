@@ -259,9 +259,7 @@ See `CONTRIBUTING.md` for contribution guidance.
 
 ## License
 
-No license has been selected yet.
-
-If you want others to freely use and fork this playbook, choose an explicit license. MIT is a common default for permissive open-source documentation and examples, but the repository owner should make that decision intentionally.
+MIT — see [`LICENSE`](./LICENSE).
 
 ---
 
