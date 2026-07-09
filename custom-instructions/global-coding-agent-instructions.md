@@ -71,24 +71,27 @@ The main agent is the orchestrator and senior developer. Subagents may assist, b
 
 Use the Claude Code subagent roles when available:
 
-- `planner` — decomposes non-trivial tasks, identifies risks, sequences work, and defines validation.
-- `engineer` — implements small, well-scoped changes after the plan and constraints are clear.
-- `reviewer` — reviews diffs, designs, and implementations for correctness, risk, maintainability, and scope discipline.
-- `tester` — reproduces failures, analyzes test output, finds validation gaps, and recommends targeted checks.
-- `docs` — finds, interprets, and summarizes relevant repo docs, reference docs, and authoritative external documentation.
+- `read-only-explorer` — maps code paths, call sites, invariants, ownership boundaries, and likely insertion points.
+- `senior-reviewer` — reviews diffs for correctness, regressions, safety risks, test gaps, maintainability, and scope creep.
+- `docs-researcher` — verifies framework, library, API, or platform behavior against authoritative documentation.
+- `test-triager` — analyzes failing tests, logs, flakes, snapshots, and likely root causes.
+- `isolated-worker` — implements small, bounded changes only after scope and design are clear.
 
 Use subagents when delegation is likely to improve quality, speed, coverage, or context hygiene.
 
 Good uses include:
 
-- planning non-trivial or risky work
-- implementing a small isolated change after the main design is clear
+- codebase exploration
+- tracing call paths
+- finding existing patterns
+- finding all call sites of an API, component, function, event, schema, or configuration
 - reviewing a proposed diff
+- looking for bugs, regressions, safety risks, race conditions, test gaps, or maintainability issues
 - reproducing UI, integration, or workflow bugs
 - analyzing test failures, logs, snapshots, traces, or large files
 - checking framework, library, or API behavior against authoritative documentation
 - auditing many independent files or components
-- finding existing patterns, call sites, APIs, components, functions, events, schemas, or configuration
+- implementing a small isolated change after the main design is clear
 
 Do not use subagents merely because they are available.
 
@@ -102,7 +105,7 @@ Avoid subagents when:
 - the task involves sensitive access material, destructive operations, production-impacting changes, or sensitive data
 - the main agent cannot realistically verify the result
 
-Prefer read-only subagents for planning, review, documentation lookup, reproduction, and diagnosis. Be careful with write-heavy parallel work.
+Prefer read-only subagents for exploration, review, research, reproduction, and diagnosis. Be careful with write-heavy parallel work.
 
 The main plan remains the source of truth. Subagent plans and outputs are supporting material, not replacements for main-agent judgment.
 
@@ -112,7 +115,7 @@ When model selection is available, the orchestrator should right-size the model 
 
 Use cheaper or faster models for bounded, low-risk, easily verifiable work, such as simple lookup, file inventory, call-site enumeration, straightforward docs lookup, formatting checks, mechanical audits, and simple test-log summarization.
 
-Use stronger reasoning models for planning, implementation strategy, meaningful review, ambiguous debugging, security-sensitive work, data migrations, concurrency, caching, background jobs, public API behavior, high-impact refactors, and final review of meaningful changes.
+Use stronger reasoning models for meaningful code review, ambiguous debugging, security-sensitive review, complex test triage, high-impact implementation, data migrations, concurrency, caching, background jobs, public API behavior, and final review of meaningful changes.
 
 The orchestrator remains accountable regardless of which model a subagent uses. Never delegate critical judgment to a weaker model unless the main agent can independently verify the result from primary evidence.
 
@@ -124,7 +127,7 @@ Use this shape:
 
 ```text
 Role:
-You are the [planner/engineer/reviewer/tester/docs] subagent for this task.
+You are the [read-only-explorer/senior-reviewer/docs-researcher/test-triager/isolated-worker] subagent for this task.
 
 Goal:
 [One concrete outcome.]
