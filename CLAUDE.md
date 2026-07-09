@@ -11,6 +11,7 @@ Repository-specific guidance overrides the global instructions where it is more 
 - Keep repository-specific, machine-specific, and workflow-specific details out of global instructions.
 - Prefer concise, practical guidance over long theory.
 - Make the main agent accountable for planning, delegation, validation, and final reporting.
+- Keep the Claude Code subagent model aligned around `planner`, `engineer`, `reviewer`, `tester`, and `docs`.
 
 ## Content Rules
 
@@ -26,8 +27,10 @@ This repo is mostly Markdown, with a small set of YAML frontmatter blocks in ski
 
 - Review Markdown headings and fenced code blocks for correctness.
 - Confirm each `SKILL.md` has YAML frontmatter with `name` and `description`.
-- Confirm each `agents/*.md` file has YAML frontmatter with `name`, `description`, and `tools`, and that read-only roles do not list `Edit` or `Write`.
+- Confirm each `agents/*.md` file has YAML frontmatter with `name`, `description`, and `tools`.
+- Confirm read-only roles do not list `Edit` or `Write` in their `tools` frontmatter.
 - Confirm links and paths in `README.md` match the repository tree.
+- Confirm install docs and scripts reference the current Claude Code agent files.
 
 ## License
 
