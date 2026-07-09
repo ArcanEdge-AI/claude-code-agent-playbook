@@ -82,11 +82,11 @@ $CLAUDE_HOME/
     senior-code-review/
       SKILL.md
   agents/
-    read-only-explorer.md
-    senior-reviewer.md
-    docs-researcher.md
-    test-triager.md
-    isolated-worker.md
+    planner.md
+    engineer.md
+    reviewer.md
+    tester.md
+    docs.md
 ```
 
 Each agent file under `$GLOBAL_AGENTS_HOME` must have YAML frontmatter with `name`, `description`, and `tools` (a comma-separated list), followed by the system-prompt body. Set `tools` to the minimum set the role needs — read-only roles must not include `Edit` or `Write`.
@@ -120,11 +120,19 @@ The pointer section should be:
 Supporting global reference documents live under `~/.claude/references/`:
 
 - `references/README.md` — map of available global reference docs
-- `references/subagents.md` — subagent delegation rules, assignment template, and acceptance checklist
+- `references/subagents.md` — subagent delegation rules, model selection guidance, assignment template, and acceptance checklist
 - `references/reference-doc-routing.md` — how to decide which docs to consult and how to treat them
 - `references/templates/` — templates for repository-level CLAUDE.md, architecture, testing, security, design-system, release, API, and data-model docs
 
 Reusable skills live under `~/.claude/skills/`, and global custom subagent definitions live under `~/.claude/agents/`.
+
+Claude Code subagents:
+
+- `agents/planner.md`
+- `agents/engineer.md`
+- `agents/reviewer.md`
+- `agents/tester.md`
+- `agents/docs.md`
 
 Reference documents are supporting context, not automatic truth.
 
@@ -158,10 +166,11 @@ After creating or updating files:
 2. Confirm no repository files were modified.
 3. Confirm each agent `.md` file has valid YAML frontmatter with `name`, `description`, and `tools`, and that read-only roles exclude `Edit`/`Write`.
 4. Confirm each `SKILL.md` has YAML frontmatter with `name` and `description`.
-5. Report any files backed up.
-6. Report any files skipped and why.
-7. Report any assumptions.
-8. Report whether the small `CLAUDE.md` pointer section was created, updated, already present, or skipped.
+5. Confirm the expected agent files exist: `planner.md`, `engineer.md`, `reviewer.md`, `tester.md`, and `docs.md`.
+6. Report any files backed up.
+7. Report any files skipped and why.
+8. Report any assumptions.
+9. Report whether the small `CLAUDE.md` pointer section was created, updated, already present, or skipped.
 
 Final response format:
 
