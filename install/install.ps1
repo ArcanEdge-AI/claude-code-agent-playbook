@@ -119,9 +119,17 @@ The primary global coding-agent behavior may already be configured in this CLAUD
 Supporting global reference documents live under the Claude Code home references directory:
 
 - ``references/README.md`` — map of available global reference docs
-- ``references/subagents.md`` — subagent delegation rules, assignment template, and acceptance checklist
+- ``references/subagents.md`` — subagent delegation rules, model selection guidance, assignment template, and acceptance checklist
 - ``references/reference-doc-routing.md`` — how to decide which docs to consult and how to treat them
 - ``references/templates/`` — templates for repository-level architecture, testing, access-control, design-system, release, API, and data-model docs
+
+Custom Claude Code subagents live under the Claude Code home agents directory:
+
+- ``agents/planner.md``
+- ``agents/engineer.md``
+- ``agents/reviewer.md``
+- ``agents/tester.md``
+- ``agents/docs.md``
 
 Reference documents are supporting context, not automatic truth. The main agent remains accountable for the final plan, final diff, validation, and final response.
 "@
@@ -138,7 +146,11 @@ $CheckPaths = @(
   $TargetClaudeMd,
   (Join-Path $ClaudeHome "references\subagents.md"),
   (Join-Path $ClaudeHome "references\reference-doc-routing.md"),
-  (Join-Path $ClaudeHome "agents\read-only-explorer.md"),
+  (Join-Path $ClaudeHome "agents\planner.md"),
+  (Join-Path $ClaudeHome "agents\engineer.md"),
+  (Join-Path $ClaudeHome "agents\reviewer.md"),
+  (Join-Path $ClaudeHome "agents\tester.md"),
+  (Join-Path $ClaudeHome "agents\docs.md"),
   (Join-Path $ClaudeHome "skills\subagent-orchestration\SKILL.md")
 )
 
