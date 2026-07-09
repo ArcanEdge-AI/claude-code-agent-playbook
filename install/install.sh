@@ -150,11 +150,11 @@ Supporting global reference documents live under the Claude Code home references
 
 Custom Claude Code subagents live under the Claude Code home agents directory:
 
-- `agents/planner.md`
-- `agents/engineer.md`
-- `agents/reviewer.md`
-- `agents/tester.md`
-- `agents/docs.md`
+- `agents/read-only-explorer.md`
+- `agents/senior-reviewer.md`
+- `agents/docs-researcher.md`
+- `agents/test-triager.md`
+- `agents/isolated-worker.md`
 
 Reference documents are supporting context, not automatic truth. The main agent remains accountable for the final plan, final diff, validation, and final response.'
   append_section_if_missing "$TARGET_CLAUDE_MD" "Global Reference Documents and Subagent Support" "$POINTER_BODY"
@@ -172,11 +172,11 @@ for path in \
   "$TARGET_CLAUDE_MD" \
   "$CLAUDE_HOME/references/subagents.md" \
   "$CLAUDE_HOME/references/reference-doc-routing.md" \
-  "$CLAUDE_HOME/agents/planner.md" \
-  "$CLAUDE_HOME/agents/engineer.md" \
-  "$CLAUDE_HOME/agents/reviewer.md" \
-  "$CLAUDE_HOME/agents/tester.md" \
-  "$CLAUDE_HOME/agents/docs.md" \
+  "$CLAUDE_HOME/agents/read-only-explorer.md" \
+  "$CLAUDE_HOME/agents/senior-reviewer.md" \
+  "$CLAUDE_HOME/agents/docs-researcher.md" \
+  "$CLAUDE_HOME/agents/test-triager.md" \
+  "$CLAUDE_HOME/agents/isolated-worker.md" \
   "$CLAUDE_HOME/skills/subagent-orchestration/SKILL.md"; do
   if [[ -e "$path" || "$DRY_RUN" == "1" ]]; then
     say "OK: $path"
