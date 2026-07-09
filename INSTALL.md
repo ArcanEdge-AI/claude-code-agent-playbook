@@ -25,11 +25,11 @@ $CLAUDE_HOME/
     reference-doc-routing.md
     templates/*.md
   agents/
-    planner.md
-    engineer.md
-    reviewer.md
-    tester.md
-    docs.md
+    read-only-explorer.md
+    senior-reviewer.md
+    docs-researcher.md
+    test-triager.md
+    isolated-worker.md
   skills/
     subagent-orchestration/SKILL.md
     reference-doc-routing/SKILL.md
@@ -133,11 +133,11 @@ After installation, verify:
 - `$CLAUDE_HOME/CLAUDE.md` exists or was intentionally left as a pointer-only file.
 - `$CLAUDE_HOME/references/subagents.md` exists.
 - `$CLAUDE_HOME/references/reference-doc-routing.md` exists.
-- `$CLAUDE_HOME/agents/planner.md` exists.
-- `$CLAUDE_HOME/agents/engineer.md` exists.
-- `$CLAUDE_HOME/agents/reviewer.md` exists.
-- `$CLAUDE_HOME/agents/tester.md` exists.
-- `$CLAUDE_HOME/agents/docs.md` exists.
+- `$CLAUDE_HOME/agents/read-only-explorer.md` exists.
+- `$CLAUDE_HOME/agents/senior-reviewer.md` exists.
+- `$CLAUDE_HOME/agents/docs-researcher.md` exists.
+- `$CLAUDE_HOME/agents/test-triager.md` exists.
+- `$CLAUDE_HOME/agents/isolated-worker.md` exists.
 - `$CLAUDE_HOME/skills/subagent-orchestration/SKILL.md` exists.
 - Each `SKILL.md` has `name` and `description` frontmatter.
 - Each `agents/*.md` file has `name`, `description`, and `tools` frontmatter.
@@ -151,11 +151,11 @@ To remove it manually, delete:
 
 ```text
 $CLAUDE_HOME/references/
-$CLAUDE_HOME/agents/planner.md
-$CLAUDE_HOME/agents/engineer.md
-$CLAUDE_HOME/agents/reviewer.md
-$CLAUDE_HOME/agents/tester.md
-$CLAUDE_HOME/agents/docs.md
+$CLAUDE_HOME/agents/read-only-explorer.md
+$CLAUDE_HOME/agents/senior-reviewer.md
+$CLAUDE_HOME/agents/docs-researcher.md
+$CLAUDE_HOME/agents/test-triager.md
+$CLAUDE_HOME/agents/isolated-worker.md
 $CLAUDE_HOME/skills/subagent-orchestration/
 $CLAUDE_HOME/skills/reference-doc-routing/
 $CLAUDE_HOME/skills/senior-code-review/
