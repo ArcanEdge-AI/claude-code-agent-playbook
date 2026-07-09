@@ -19,13 +19,13 @@ Use these five Claude Code subagent roles:
 
 | Subagent | Tools | Best for |
 | --- | --- | --- |
-| `planner` | Read, Grep, Glob | Decomposing non-trivial tasks, identifying risks, sequencing work, and defining validation. |
-| `engineer` | Read, Grep, Glob, Edit, Write, Bash | Implementing small, well-scoped changes after the plan and constraints are clear. |
-| `reviewer` | Read, Grep, Glob, Bash | Reviewing diffs, designs, and implementations for correctness, risk, maintainability, and scope discipline. |
-| `tester` | Read, Grep, Glob, Bash, Edit | Reproducing failures, analyzing test output, finding validation gaps, and recommending targeted checks. |
-| `docs` | Read, Grep, Glob, WebFetch, WebSearch | Finding, interpreting, and summarizing relevant repo docs, reference docs, and authoritative external documentation. |
+| `read-only-explorer` | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and likely insertion points. |
+| `senior-reviewer` | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
+| `docs-researcher` | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
+| `test-triager` | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
+| `isolated-worker` | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
 
-The role names are intentionally simple. The main agent remains the senior engineer and orchestrator.
+The role names are intentionally Claude Code-specific. They describe both the job and the expected tool-permission boundary.
 
 Claude Code agent files live under `agents/` as Markdown files with YAML frontmatter. Set each `tools:` list to the minimum set the role needs. Read-only roles should not include `Edit` or `Write`.
 
@@ -35,14 +35,17 @@ Use subagents when delegation is likely to improve quality, speed, coverage, or 
 
 Good uses include:
 
-- planning non-trivial or risky work
-- implementing a small isolated change after the main design is clear
+- codebase exploration
+- tracing call paths
+- finding existing patterns
+- finding all call sites of an API, component, function, event, schema, or configuration
 - reviewing a proposed diff
+- looking for bugs, regressions, safety risks, race conditions, test gaps, or maintainability issues
 - reproducing UI, integration, or workflow bugs
 - analyzing test failures, logs, snapshots, traces, or large files
 - checking framework, library, or API behavior against authoritative documentation
 - auditing many independent files or components
-- finding existing patterns, call sites, APIs, components, functions, events, schemas, or configuration
+- implementing a small isolated change after the main design is clear
 
 ## When Not to Use Subagents
 
@@ -56,7 +59,7 @@ Avoid subagents when:
 - the task involves sensitive access material, destructive operations, production-impacting changes, or sensitive data
 - the main agent cannot realistically verify the result
 
-Prefer read-only subagents for planning, review, documentation lookup, reproduction, and diagnosis.
+Prefer read-only subagents for exploration, review, research, reproduction, and diagnosis.
 
 Be careful with write-heavy parallel work. Do not allow multiple agents to edit the same files or tightly coupled areas at the same time unless the user explicitly asks and the conflict risk is acceptable.
 
@@ -76,15 +79,14 @@ Use cheaper or faster models for bounded, low-risk, easily verifiable work, such
 
 Use stronger reasoning models for work involving:
 
-- planning complex or multi-file work
-- implementation strategy
 - meaningful code review
 - ambiguous debugging
 - security-sensitive or access-control-sensitive review
+- complex test triage
+- high-impact isolated implementation
 - data migrations
 - concurrency, caching, or background jobs
 - public API behavior
-- high-impact refactors
 - final review of meaningful changes
 
 The orchestrator remains accountable regardless of which model a subagent uses.
@@ -97,7 +99,7 @@ Use this structure when delegating:
 
 ```text
 Role:
-You are the [planner/engineer/reviewer/tester/docs] subagent for this task.
+You are the [read-only-explorer/senior-reviewer/docs-researcher/test-triager/isolated-worker] subagent for this task.
 
 Goal:
 [One concrete outcome.]
