@@ -125,11 +125,11 @@ Supporting global reference documents live under the Claude Code home references
 
 Custom Claude Code subagents live under the Claude Code home agents directory:
 
-- ``agents/planner.md``
-- ``agents/engineer.md``
-- ``agents/reviewer.md``
-- ``agents/tester.md``
-- ``agents/docs.md``
+- ``agents/read-only-explorer.md``
+- ``agents/senior-reviewer.md``
+- ``agents/docs-researcher.md``
+- ``agents/test-triager.md``
+- ``agents/isolated-worker.md``
 
 Reference documents are supporting context, not automatic truth. The main agent remains accountable for the final plan, final diff, validation, and final response.
 "@
@@ -146,11 +146,11 @@ $CheckPaths = @(
   $TargetClaudeMd,
   (Join-Path $ClaudeHome "references\subagents.md"),
   (Join-Path $ClaudeHome "references\reference-doc-routing.md"),
-  (Join-Path $ClaudeHome "agents\planner.md"),
-  (Join-Path $ClaudeHome "agents\engineer.md"),
-  (Join-Path $ClaudeHome "agents\reviewer.md"),
-  (Join-Path $ClaudeHome "agents\tester.md"),
-  (Join-Path $ClaudeHome "agents\docs.md"),
+  (Join-Path $ClaudeHome "agents\read-only-explorer.md"),
+  (Join-Path $ClaudeHome "agents\senior-reviewer.md"),
+  (Join-Path $ClaudeHome "agents\docs-researcher.md"),
+  (Join-Path $ClaudeHome "agents\test-triager.md"),
+  (Join-Path $ClaudeHome "agents\isolated-worker.md"),
   (Join-Path $ClaudeHome "skills\subagent-orchestration\SKILL.md")
 )
 
