@@ -11,7 +11,7 @@ Repository-specific guidance overrides the global instructions where it is more 
 - Keep repository-specific, machine-specific, and workflow-specific details out of global instructions.
 - Prefer concise, practical guidance over long theory.
 - Make the main agent accountable for planning, delegation, validation, and final reporting.
-- Keep the Claude Code subagent model aligned around `planner`, `engineer`, `reviewer`, `tester`, and `docs`.
+- Keep the Claude Code subagent model aligned around `read-only-explorer`, `senior-reviewer`, `docs-researcher`, `test-triager`, and `isolated-worker`.
 
 ## Content Rules
 
