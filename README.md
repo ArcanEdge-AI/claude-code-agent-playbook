@@ -142,7 +142,7 @@ The intent is not to make the agent slower for its own sake. The intent is to ma
 | Setup prompt | `claude-prompts/` | Prompt for creating user-level references, skills, and subagents. |
 | Reference docs | `references/` | Routing, subagent delegation, and reusable project-doc templates. |
 | Skills | `skills/` | Reusable workflows for orchestration, doc routing, and senior review. |
-| Custom agents | `agents/` | Example subagent definitions for exploration, review, research, triage, and isolated implementation. |
+| Custom agents | `agents/` | Claude Code subagent definitions for planning, engineering, review, testing, and documentation. |
 | Repo guidance | `CLAUDE.md` | Instructions for maintaining this public playbook repository. |
 
 ---
@@ -186,15 +186,17 @@ Subagents can help, but they do not own the outcome. Their job is to return boun
 
 ## Subagent Model
 
-This playbook treats subagents like focused engineering assistants, not autonomous owners. Each one is defined as a `.md` file with YAML frontmatter under `agents/`, and each restricts its `tools:` list to match its role — read-only roles genuinely cannot call `Edit` or `Write`, rather than just being told not to.
+This playbook uses five Claude Code subagent roles that mirror a practical software delivery loop. Each one is defined as a `.md` file with YAML frontmatter under `agents/`, and each restricts its `tools:` list to match its role.
 
 | Subagent | Tools | Best for |
 | --- | --- | --- |
-| `read-only-explorer` | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and insertion points. |
-| `senior-reviewer` | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
-| `docs-researcher` | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
-| `test-triager` | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
-| `isolated-worker` | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
+| `planner` | Read, Grep, Glob | Decomposing non-trivial tasks, identifying risks, sequencing work, and defining validation. |
+| `engineer` | Read, Grep, Glob, Edit, Write, Bash | Implementing small, well-scoped changes after the plan and constraints are clear. |
+| `reviewer` | Read, Grep, Glob, Bash | Reviewing diffs, designs, and implementations for correctness, risk, maintainability, and scope discipline. |
+| `tester` | Read, Grep, Glob, Bash, Edit | Reproducing failures, analyzing test output, finding validation gaps, and recommending targeted checks. |
+| `docs` | Read, Grep, Glob, WebFetch, WebSearch | Finding, interpreting, and summarizing relevant repo docs, reference docs, and authoritative external documentation. |
+
+When model selection is available, the orchestrator should right-size the model for each subagent task. Use cheaper or faster models for bounded, low-risk, easily verifiable work. Use stronger reasoning models for planning, implementation strategy, meaningful review, ambiguous debugging, security-sensitive work, and high-impact changes.
 
 The delegation rule is simple:
 
@@ -202,7 +204,7 @@ The delegation rule is simple:
 Precise assignment → Evidence-backed output → Main-agent verification → Accept or reject
 ```
 
-A good subagent prompt includes role, goal, context, scope, non-goals, permissions, required evidence, output format, and stop conditions.
+A good subagent prompt includes role, goal, context, model/reasoning guidance, scope, non-goals, permissions, required evidence, output format, and stop conditions.
 
 ---
 
@@ -241,11 +243,11 @@ references/subagents.md
 ├── assets/
 │   └── claude-code-agent-playbook-hero.png
 ├── agents/
-│   ├── docs-researcher.md
-│   ├── isolated-worker.md
-│   ├── read-only-explorer.md
-│   ├── senior-reviewer.md
-│   └── test-triager.md
+│   ├── docs.md
+│   ├── engineer.md
+│   ├── planner.md
+│   ├── reviewer.md
+│   └── tester.md
 ├── claude-prompts/
 │   └── setup-global-claude-support-system.md
 ├── custom-instructions/
@@ -289,10 +291,10 @@ Better delegation:
 
 ```text
 Role:
-You are a read-only explorer.
+You are the Planner subagent for this task.
 
 Goal:
-Find where checkout tax is calculated and identify the smallest safe insertion point for a customer exemption flag.
+Identify the smallest safe implementation plan for adding a customer exemption flag to checkout tax calculation.
 
 Scope:
 Inspect checkout, cart, customer, and tax calculation code paths only.
@@ -301,7 +303,7 @@ Non-goals:
 Do not edit files. Do not refactor. Do not propose a new tax engine.
 
 Evidence required:
-Return file paths, function names, call chain, relevant tests, and existing exemption concepts.
+Return file paths, function names, likely insertion points, relevant tests, and existing exemption concepts.
 ```
 
 The main agent still decides the design, applies or rejects recommendations, and verifies the final diff.
