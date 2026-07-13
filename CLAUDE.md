@@ -12,6 +12,7 @@ Repository-specific guidance overrides the global instructions where it is more 
 - Prefer concise, practical guidance over long theory.
 - Make the main agent accountable for planning, delegation, validation, and final reporting.
 - Keep the Claude Code subagent model aligned around `read-only-explorer`, `senior-reviewer`, `docs-researcher`, `test-triager`, and `isolated-worker`.
+- Keep every custom subagent pinned to an explicit task-appropriate model so it does not inherit the main conversation model unintentionally.
 
 ## Content Rules
 
@@ -27,8 +28,9 @@ This repo is mostly Markdown, with a small set of YAML frontmatter blocks in ski
 
 - Review Markdown headings and fenced code blocks for correctness.
 - Confirm each `SKILL.md` has YAML frontmatter with `name` and `description`.
-- Confirm each `agents/*.md` file has YAML frontmatter with `name`, `description`, and `tools`.
+- Confirm each `agents/*.md` file has YAML frontmatter with `name`, `description`, `model`, and `tools`.
 - Confirm read-only roles do not list `Edit` or `Write` in their `tools` frontmatter.
+- Confirm smaller-model profiles include clear stop and escalation conditions.
 - Confirm links and paths in `README.md` match the repository tree.
 - Confirm install docs and scripts reference the current Claude Code agent files.
 
