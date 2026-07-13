@@ -2,13 +2,13 @@
 
 This directory contains global reference documents that the main Claude Code agent may consult when planning, delegating, implementing, reviewing, or validating work.
 
-These documents are intentionally generic and tool-agnostic. They should not contain repo-specific workflows, sensitive access material, local machine quirks, project names, or one-off incident notes.
+These documents are intentionally generic and tool-agnostic unless explicitly Claude-Code-specific. They should not contain repo-specific workflows, sensitive access material, local machine quirks, project names, or one-off incident notes.
 
 ## How to Use These References
 
 The main agent should:
 
-1. Start with the current user request and applicable repository instructions (`CLAUDE.md`).
+1. Start with the current user request and applicable repository instructions.
 2. Inspect current code, tests, configuration, and docs.
 3. Consult only the global reference documents that are relevant.
 4. Treat reference docs as supporting context, not automatic truth.
@@ -29,9 +29,10 @@ Primary evidence includes:
 
 ## Available References
 
+- `model-routing.md` — mandatory model-selection and escalation rules for Claude Code subagents.
 - `subagents.md` — rules for when and how to delegate to subagents.
 - `reference-doc-routing.md` — how to choose and classify reference documents.
-- `templates/repository-CLAUDE.md` — starter template for repo-specific `CLAUDE.md` instructions.
+- `templates/repository-CLAUDE.md` — starter template for repo-specific instructions.
 - `templates/architecture.md` — architecture reference template.
 - `templates/testing.md` — testing strategy template.
 - `templates/security.md` — safety and access-control model template.
@@ -42,9 +43,9 @@ Primary evidence includes:
 
 ## Placement Rules
 
-Use global references (`~/.claude/references/`) for durable, cross-repository guidance.
+Use global references for durable, cross-repository guidance.
 
-Use repository-level `CLAUDE.md` for:
+Use repository-level docs for:
 
 - repo architecture
 - repo build/test commands
@@ -56,4 +57,4 @@ Use repository-level `CLAUDE.md` for:
 
 Use skills for repeatable workflows.
 
-Use local notes (or `CLAUDE.local.md`) for machine-specific or shell-specific quirks.
+Use local notes for machine-specific or shell-specific quirks.
