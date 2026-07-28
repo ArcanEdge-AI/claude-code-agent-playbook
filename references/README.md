@@ -30,7 +30,7 @@ Primary evidence includes:
 
 ## Available References
 
-- `model-routing.md` — mandatory Claude model-selection, effort, escalation, and acceptance rules for subagents.
+- `model-routing.md` — mandatory Claude model, effort, permission, isolation, escalation, and acceptance rules for subagents.
 - `subagents.md` — rules for when and how to delegate to Claude Code subagents.
 - `multi-session-coordination.md` — discovery, ownership, sequencing, session naming, conflict detection, and integration guidance for independent Claude Code sessions.
 - `reference-doc-routing.md` — how to choose and classify reference documents.
