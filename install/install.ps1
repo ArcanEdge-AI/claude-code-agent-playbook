@@ -119,7 +119,7 @@ The primary global coding-agent behavior may already be configured in this CLAUD
 Supporting global reference documents live under the Claude Code home references directory:
 
 - ``references/README.md`` — map of available global reference docs
-- ``references/model-routing.md`` — mandatory Claude model-selection, effort, escalation, and acceptance rules
+- ``references/model-routing.md`` — mandatory Claude model, effort, permission, isolation, escalation, and acceptance rules
 - ``references/subagents.md`` — Claude Code subagent delegation rules, assignment template, and acceptance checklist
 - ``references/multi-session-coordination.md`` — Claude Code session discovery, naming, ownership, sequencing, conflict detection, and integration guidance
 - ``references/reference-doc-routing.md`` — how to decide which docs to consult and how to treat them
@@ -190,6 +190,7 @@ Get-ChildItem -LiteralPath (Join-Path $ClaudeHome "agents") -Filter *.md -ErrorA
       $Text -match "(?m)^description:" -and
       $Text -match "(?m)^model:" -and
       $Text -match "(?m)^effort:" -and
+      $Text -match "(?m)^permissionMode:" -and
       $Text -match "(?m)^tools:") {
     Write-Step "OK Claude Code frontmatter: $($_.FullName)"
   } else {
