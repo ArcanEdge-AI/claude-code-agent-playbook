@@ -143,7 +143,7 @@ The intent is not to make the agent slower for its own sake. The intent is to ma
 | Install scripts | `install/` | Manual installers for Unix-like shells and PowerShell. |
 | Global instructions | `custom-instructions/` | Tool-agnostic behavior rules for elegant, maintainable code. Paste into your global `CLAUDE.md`. |
 | Prompts | `claude-prompts/` | Setup and active-project coordination prompts. |
-| Reference docs | `references/` | Model routing, subagent delegation, multi-session coordination, and reusable project-doc templates. |
+| Reference docs | `references/` | Model, effort, permission, and isolation routing; subagent delegation; multi-session coordination; and reusable project-doc templates. |
 | Skills | `skills/` | Reusable workflows for orchestration, session coordination, document routing, and senior review. |
 | Custom agents | `agents/` | Claude Code subagent definitions for exploration, review, docs research, test triage, and isolated implementation. |
 | Repository guidance | `CLAUDE.md` | Instructions for maintaining this public playbook repository. |
@@ -190,17 +190,19 @@ Subagents can help, but they do not own the outcome. Their job is to return boun
 
 ## Subagent Model
 
-This playbook treats Claude Code subagents as focused engineering assistants, not autonomous owners. Each one is defined as a Markdown file with YAML frontmatter under `agents/` and explicitly sets its Claude model, effort level, and minimum tool permissions.
+This playbook treats Claude Code subagents as focused engineering assistants, not autonomous owners. Each one is defined as a Markdown file with YAML frontmatter under `agents/` and explicitly sets its Claude model, effort level, permission mode, and minimum tool permissions.
 
-| Subagent | Model | Effort | Tools | Best for |
-| --- | --- | --- | --- | --- |
-| `read-only-explorer` | Haiku | Low | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and insertion points. |
-| `senior-reviewer` | Sonnet | High | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
-| `docs-researcher` | Haiku | Low | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
-| `test-triager` | Sonnet | Medium | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
-| `isolated-worker` | Sonnet | Medium | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
+| Subagent | Model | Effort | Permission | Tools | Best for |
+| --- | --- | --- | --- | --- | --- |
+| `read-only-explorer` | Haiku | Low | Plan | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and insertion points. |
+| `senior-reviewer` | Sonnet | High | Plan | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
+| `docs-researcher` | Haiku | Low | Plan | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
+| `test-triager` | Sonnet | Medium | Default | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
+| `isolated-worker` | Sonnet | Medium | Default | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
 
-Model and effort routing is mandatory. The configured profiles prevent routine work from unintentionally inheriting the main conversation's model and effort. Opus or higher-effort escalation must be justified and independently verified.
+Model, effort, permission, and tool routing is mandatory. The configured profiles prevent routine work from unintentionally inheriting broader main-session settings. Opus, higher effort, broader permissions, or worktree isolation must be justified and independently verified.
+
+Worktree isolation is not enabled globally because an isolated subagent may start from the repository's default branch instead of the parent session's current `HEAD`. Use it only when the assignment's required base state is explicit.
 
 See:
 
@@ -216,7 +218,7 @@ The delegation rule is simple:
 Precise assignment → Evidence-backed output → Main-session verification → Accept or reject
 ```
 
-A good subagent prompt includes role, selected profile or model, effort, goal, context, scope, non-goals, permissions, required evidence, escalation conditions, output format, and stop conditions.
+A good subagent prompt includes role, selected profile or model, effort, permission mode, tool boundary, goal, context, scope, non-goals, required evidence, escalation conditions, output format, and stop conditions.
 
 ---
 
@@ -374,7 +376,7 @@ Role:
 You are the read-only-explorer subagent for this task.
 
 Selected profile:
-read-only-explorer — Haiku, low effort.
+read-only-explorer — Haiku, low effort, plan mode.
 
 Goal:
 Find where checkout tax is calculated and identify the smallest safe insertion point for a customer exemption flag.
@@ -400,7 +402,7 @@ The main session still decides the design, applies or rejects recommendations, a
 2. Let the installer configure global instructions, references, skills, and subagents.
 3. Add repository-specific CLAUDE.md guidance to each project.
 4. For non-trivial work, let the main session plan first.
-5. Delegate only bounded work with explicit model, effort, and evidence requirements.
+5. Delegate only bounded work with explicit model, effort, permission, tool, and evidence requirements.
 6. When independent project sessions run in parallel, use the multi-session coordination skill.
 7. Verify the final combined diff before accepting completion.
 ```
