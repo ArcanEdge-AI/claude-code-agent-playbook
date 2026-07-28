@@ -45,10 +45,10 @@ session_name: "Project - Three-to-Four-Word Description"
 status: "planned | in-progress | blocked | integration-ready | merged | abandoned"
 session_id: "Optional Claude Code session identifier"
 owner: "Optional responsible person or team"
-project_directory: "/repository-relative-or-portable-project-identifier"
+project_directory: "."
 branch: "feature/example"
-base_branch: "master"
-worktree: "Optional worktree identifier"
+base_branch: "Detected repository default branch"
+worktree: "Optional repository-relative worktree identifier"
 last_updated: "YYYY-MM-DDTHH:MM:SSZ"
 
 objective: >-
@@ -91,6 +91,7 @@ notes: >-
 - Keep the record current while the work remains active.
 - Use repository-relative paths whenever possible.
 - Keep `session_name` aligned with the naming standard for newly created sessions.
+- Detect the repository's actual default branch instead of assuming `main` or `master`.
 - Do not store credentials, tokens, private local paths, or sensitive access material.
 - Do not paste full session transcripts, long logs, or unrelated implementation notes.
 - Mark abandoned work explicitly instead of silently leaving stale records active.
