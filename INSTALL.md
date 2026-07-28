@@ -21,9 +21,13 @@ $CLAUDE_HOME/
   CLAUDE.md
   references/
     README.md
+    model-routing.md
     subagents.md
+    multi-session-coordination.md
     reference-doc-routing.md
-    templates/*.md
+    templates/
+      active-work-record.md
+      *.md
   agents/
     read-only-explorer.md
     senior-reviewer.md
@@ -32,6 +36,7 @@ $CLAUDE_HOME/
     isolated-worker.md
   skills/
     subagent-orchestration/SKILL.md
+    multi-session-coordination/SKILL.md
     reference-doc-routing/SKILL.md
     senior-code-review/SKILL.md
 ```
@@ -51,7 +56,7 @@ Full install:
 
 - installs the global coding-agent instructions into `$CLAUDE_HOME/CLAUDE.md`
 - copies reference docs into `$CLAUDE_HOME/references/`
-- copies custom agent definitions into `$CLAUDE_HOME/agents/`
+- copies custom Claude Code subagent definitions into `$CLAUDE_HOME/agents/`
 - copies skills into `$CLAUDE_HOME/skills/`
 
 If `$CLAUDE_HOME/CLAUDE.md` already exists, preserve it and append a clearly marked Claude Code Agent Playbook section unless the section is already present.
@@ -64,7 +69,7 @@ Support-only install:
 
 - does not duplicate the full global instructions into `$CLAUDE_HOME/CLAUDE.md`
 - adds only a short reference-map pointer if useful
-- still copies reference docs, skills, and custom agent definitions
+- still copies reference docs, skills, and custom Claude Code subagent definitions
 
 ## Human Install
 
@@ -112,16 +117,16 @@ pwsh -ExecutionPolicy Bypass -File install/install.ps1 -Full -DryRun
 
 ## Agent Install Instructions
 
-When an AI coding agent is asked to install this repo, it should:
+When an AI coding agent is asked to install this repository, it should:
 
 1. Clone or fetch the repository from the provided URL.
 2. Read this `INSTALL.md` file first.
 3. Resolve `CLAUDE_HOME`.
 4. Inspect existing target files before writing.
 5. Back up any existing file before changing it.
-6. Use full install unless the user explicitly asks for support-only mode or the user clearly states the global instructions already live in their global `CLAUDE.md`.
-7. Copy reference docs, skills, and custom agent definitions to the expected user-level locations.
-8. Validate the installed files.
+6. Use full install unless the user explicitly asks for support-only mode or clearly states that the global instructions already live in their global `CLAUDE.md`.
+7. Copy reference docs, skills, and custom Claude Code subagent definitions to the expected user-level locations.
+8. Validate the installed files and Claude Code YAML frontmatter.
 9. Report exactly what changed, what was skipped, and where backups were written.
 
 Do not modify arbitrary repositories during installation. Only use a temporary clone of this repository and user-level Claude Code configuration locations.
@@ -131,17 +136,24 @@ Do not modify arbitrary repositories during installation. Only use a temporary c
 After installation, verify:
 
 - `$CLAUDE_HOME/CLAUDE.md` exists or was intentionally left as a pointer-only file.
+- `$CLAUDE_HOME/references/model-routing.md` exists.
 - `$CLAUDE_HOME/references/subagents.md` exists.
+- `$CLAUDE_HOME/references/multi-session-coordination.md` exists.
 - `$CLAUDE_HOME/references/reference-doc-routing.md` exists.
+- `$CLAUDE_HOME/references/templates/active-work-record.md` exists.
 - `$CLAUDE_HOME/agents/read-only-explorer.md` exists.
 - `$CLAUDE_HOME/agents/senior-reviewer.md` exists.
 - `$CLAUDE_HOME/agents/docs-researcher.md` exists.
 - `$CLAUDE_HOME/agents/test-triager.md` exists.
 - `$CLAUDE_HOME/agents/isolated-worker.md` exists.
 - `$CLAUDE_HOME/skills/subagent-orchestration/SKILL.md` exists.
+- `$CLAUDE_HOME/skills/multi-session-coordination/SKILL.md` exists.
 - Each `SKILL.md` has `name` and `description` frontmatter.
-- Each `agents/*.md` file has `name`, `description`, and `tools` frontmatter.
-- Read-only roles exclude `Edit` and `Write` from their `tools` frontmatter.
+- Each `agents/*.md` file has `name`, `description`, `model`, `effort`, `permissionMode`, and `tools` frontmatter.
+- Read-only roles use `permissionMode: plan` and exclude `Edit` and `Write` from their `tools` frontmatter.
+- Write-capable bundled roles use `permissionMode: default` unless a different mode has explicit maintainer approval.
+- Agent models use supported Claude Code model aliases rather than inherited or unrelated model identifiers.
+- No non-Claude configuration paths, subagent schemas, or command vocabulary were introduced.
 
 ## Uninstall
 
@@ -157,6 +169,7 @@ $CLAUDE_HOME/agents/docs-researcher.md
 $CLAUDE_HOME/agents/test-triager.md
 $CLAUDE_HOME/agents/isolated-worker.md
 $CLAUDE_HOME/skills/subagent-orchestration/
+$CLAUDE_HOME/skills/multi-session-coordination/
 $CLAUDE_HOME/skills/reference-doc-routing/
 $CLAUDE_HOME/skills/senior-code-review/
 ```

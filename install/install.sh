@@ -19,8 +19,8 @@ for arg in "$@"; do
       cat <<'HELP'
 Usage: bash install/install.sh [--full|--support-only] [--dry-run]
 
---full          Install global instructions plus references, skills, and custom agents.
---support-only  Install references, skills, and custom agents; add only a pointer to CLAUDE.md.
+--full          Install global instructions plus references, skills, and custom Claude Code subagents.
+--support-only  Install references, skills, and subagents; add only a pointer to CLAUDE.md.
 --dry-run       Print actions without writing files.
 HELP
       exit 0
@@ -144,9 +144,18 @@ else
 Supporting global reference documents live under the Claude Code home references directory:
 
 - `references/README.md` — map of available global reference docs
-- `references/subagents.md` — subagent delegation rules, model selection guidance, assignment template, and acceptance checklist
+- `references/model-routing.md` — mandatory Claude model, effort, permission, isolation, escalation, and acceptance rules
+- `references/subagents.md` — Claude Code subagent delegation rules, assignment template, and acceptance checklist
+- `references/multi-session-coordination.md` — Claude Code session discovery, naming, ownership, sequencing, conflict detection, and integration guidance
 - `references/reference-doc-routing.md` — how to decide which docs to consult and how to treat them
-- `references/templates/` — templates for repository-level architecture, testing, access-control, design-system, release, API, and data-model docs
+- `references/templates/` — templates for repository-level CLAUDE.md, architecture, testing, access control, design system, release, API, data model, and active work docs
+
+Reusable Claude Code skills live under the Claude Code home skills directory:
+
+- `skills/subagent-orchestration/SKILL.md`
+- `skills/multi-session-coordination/SKILL.md`
+- `skills/reference-doc-routing/SKILL.md`
+- `skills/senior-code-review/SKILL.md`
 
 Custom Claude Code subagents live under the Claude Code home agents directory:
 
@@ -156,7 +165,7 @@ Custom Claude Code subagents live under the Claude Code home agents directory:
 - `agents/test-triager.md`
 - `agents/isolated-worker.md`
 
-Reference documents are supporting context, not automatic truth. The main agent remains accountable for the final plan, final diff, validation, and final response.'
+Reference documents are supporting context, not automatic truth. The main Claude Code session remains accountable for the final plan, final diff, validation, and final response.'
   append_section_if_missing "$TARGET_CLAUDE_MD" "Global Reference Documents and Subagent Support" "$POINTER_BODY"
 fi
 
@@ -170,14 +179,18 @@ say "Validation:"
 
 for path in \
   "$TARGET_CLAUDE_MD" \
+  "$CLAUDE_HOME/references/model-routing.md" \
   "$CLAUDE_HOME/references/subagents.md" \
+  "$CLAUDE_HOME/references/multi-session-coordination.md" \
   "$CLAUDE_HOME/references/reference-doc-routing.md" \
+  "$CLAUDE_HOME/references/templates/active-work-record.md" \
   "$CLAUDE_HOME/agents/read-only-explorer.md" \
   "$CLAUDE_HOME/agents/senior-reviewer.md" \
   "$CLAUDE_HOME/agents/docs-researcher.md" \
   "$CLAUDE_HOME/agents/test-triager.md" \
   "$CLAUDE_HOME/agents/isolated-worker.md" \
-  "$CLAUDE_HOME/skills/subagent-orchestration/SKILL.md"; do
+  "$CLAUDE_HOME/skills/subagent-orchestration/SKILL.md" \
+  "$CLAUDE_HOME/skills/multi-session-coordination/SKILL.md"; do
   if [[ -e "$path" || "$DRY_RUN" == "1" ]]; then
     say "OK: $path"
   else
@@ -196,12 +209,17 @@ done
 
 for agent in "$CLAUDE_HOME/agents"/*.md; do
   [[ -f "$agent" ]] || continue
-  if grep -q '^name:' "$agent" && grep -q '^description:' "$agent" && grep -q '^tools:' "$agent"; then
-    say "OK frontmatter: $agent"
+  if grep -q '^name:' "$agent" \
+    && grep -q '^description:' "$agent" \
+    && grep -q '^model:' "$agent" \
+    && grep -q '^effort:' "$agent" \
+    && grep -q '^permissionMode:' "$agent" \
+    && grep -q '^tools:' "$agent"; then
+    say "OK Claude Code frontmatter: $agent"
   else
-    say "Check frontmatter: $agent" >&2
+    say "Check Claude Code frontmatter: $agent" >&2
   fi
 done
 
 say ""
-say "Install complete. Restart Claude Code or start a new session if needed so new instructions, skills, and agents are loaded."
+say "Install complete. Restart Claude Code or start a new session if needed so new instructions, skills, and subagents are loaded."

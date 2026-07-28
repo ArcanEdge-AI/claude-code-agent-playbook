@@ -119,9 +119,18 @@ The primary global coding-agent behavior may already be configured in this CLAUD
 Supporting global reference documents live under the Claude Code home references directory:
 
 - ``references/README.md`` — map of available global reference docs
-- ``references/subagents.md`` — subagent delegation rules, model selection guidance, assignment template, and acceptance checklist
+- ``references/model-routing.md`` — mandatory Claude model, effort, permission, isolation, escalation, and acceptance rules
+- ``references/subagents.md`` — Claude Code subagent delegation rules, assignment template, and acceptance checklist
+- ``references/multi-session-coordination.md`` — Claude Code session discovery, naming, ownership, sequencing, conflict detection, and integration guidance
 - ``references/reference-doc-routing.md`` — how to decide which docs to consult and how to treat them
-- ``references/templates/`` — templates for repository-level architecture, testing, access-control, design-system, release, API, and data-model docs
+- ``references/templates/`` — templates for repository-level CLAUDE.md, architecture, testing, access control, design system, release, API, data model, and active work docs
+
+Reusable Claude Code skills live under the Claude Code home skills directory:
+
+- ``skills/subagent-orchestration/SKILL.md``
+- ``skills/multi-session-coordination/SKILL.md``
+- ``skills/reference-doc-routing/SKILL.md``
+- ``skills/senior-code-review/SKILL.md``
 
 Custom Claude Code subagents live under the Claude Code home agents directory:
 
@@ -131,7 +140,7 @@ Custom Claude Code subagents live under the Claude Code home agents directory:
 - ``agents/test-triager.md``
 - ``agents/isolated-worker.md``
 
-Reference documents are supporting context, not automatic truth. The main agent remains accountable for the final plan, final diff, validation, and final response.
+Reference documents are supporting context, not automatic truth. The main Claude Code session remains accountable for the final plan, final diff, validation, and final response.
 "@
   Append-SectionIfMissing $TargetClaudeMd "Global Reference Documents and Subagent Support" $PointerBody
 }
@@ -144,14 +153,18 @@ Write-Step ""
 Write-Step "Validation:"
 $CheckPaths = @(
   $TargetClaudeMd,
+  (Join-Path $ClaudeHome "references\model-routing.md"),
   (Join-Path $ClaudeHome "references\subagents.md"),
+  (Join-Path $ClaudeHome "references\multi-session-coordination.md"),
   (Join-Path $ClaudeHome "references\reference-doc-routing.md"),
+  (Join-Path $ClaudeHome "references\templates\active-work-record.md"),
   (Join-Path $ClaudeHome "agents\read-only-explorer.md"),
   (Join-Path $ClaudeHome "agents\senior-reviewer.md"),
   (Join-Path $ClaudeHome "agents\docs-researcher.md"),
   (Join-Path $ClaudeHome "agents\test-triager.md"),
   (Join-Path $ClaudeHome "agents\isolated-worker.md"),
-  (Join-Path $ClaudeHome "skills\subagent-orchestration\SKILL.md")
+  (Join-Path $ClaudeHome "skills\subagent-orchestration\SKILL.md"),
+  (Join-Path $ClaudeHome "skills\multi-session-coordination\SKILL.md")
 )
 
 foreach ($Path in $CheckPaths) {
@@ -173,12 +186,17 @@ Get-ChildItem -LiteralPath (Join-Path $ClaudeHome "skills") -Filter SKILL.md -Re
 
 Get-ChildItem -LiteralPath (Join-Path $ClaudeHome "agents") -Filter *.md -ErrorAction SilentlyContinue | ForEach-Object {
   $Text = Get-Content -LiteralPath $_.FullName -Raw
-  if ($Text -match "(?m)^name:" -and $Text -match "(?m)^description:" -and $Text -match "(?m)^tools:") {
-    Write-Step "OK frontmatter: $($_.FullName)"
+  if ($Text -match "(?m)^name:" -and
+      $Text -match "(?m)^description:" -and
+      $Text -match "(?m)^model:" -and
+      $Text -match "(?m)^effort:" -and
+      $Text -match "(?m)^permissionMode:" -and
+      $Text -match "(?m)^tools:") {
+    Write-Step "OK Claude Code frontmatter: $($_.FullName)"
   } else {
-    Write-Warning "Check frontmatter: $($_.FullName)"
+    Write-Warning "Check Claude Code frontmatter: $($_.FullName)"
   }
 }
 
 Write-Step ""
-Write-Step "Install complete. Restart Claude Code or start a new session if needed so new instructions, skills, and agents are loaded."
+Write-Step "Install complete. Restart Claude Code or start a new session if needed so new instructions, skills, and subagents are loaded."

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Configure Claude Code to behave less like a loose autocomplete engine and more like a disciplined senior engineer: plan clearly, change surgically, delegate carefully, verify honestly, and ship maintainable code.
+  Configure Claude Code to behave less like a loose autocomplete engine and more like a disciplined senior engineer: plan clearly, change surgically, delegate carefully, coordinate parallel sessions, verify honestly, and ship maintainable code.
 </p>
 
 <p align="center">
@@ -18,13 +18,15 @@
   <a href="#why-this-exists">Why This Exists</a> ·
   <a href="#whats-inside">What's Inside</a> ·
   <a href="#subagent-model">Subagent Model</a> ·
+  <a href="#coordinating-parallel-claude-code-sessions">Parallel Sessions</a> ·
   <a href="#repository-structure">Structure</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude%20Code-Playbook-6E7BFF" alt="Claude Code Playbook" />
   <img src="https://img.shields.io/badge/Subagents-Orchestrated-00C2FF" alt="Subagents Orchestrated" />
-  <img src="https://img.shields.io/badge/Instructions-Tool--Agnostic-8A5CFF" alt="Tool Agnostic" />
+  <img src="https://img.shields.io/badge/Sessions-Coordinated-4ECDC4" alt="Sessions Coordinated" />
+  <img src="https://img.shields.io/badge/Instructions-Tool--Agnostic-8A5CFF" alt="Instructions Tool Agnostic" />
   <img src="https://img.shields.io/badge/Status-Active-2ECC71" alt="Status Active" />
 </p>
 
@@ -32,7 +34,7 @@
 
 ## Install with One Prompt
 
-The easiest install path is to give this repo URL to your coding agent:
+The easiest install path is to give this repository URL to your coding agent:
 
 ```text
 Install this globally: https://github.com/ArcanEdge-AI/claude-code-agent-playbook
@@ -40,7 +42,7 @@ Install this globally: https://github.com/ArcanEdge-AI/claude-code-agent-playboo
 Follow the repository's INSTALL.md exactly. Preserve my existing instructions, back up anything you change, install the global instructions, references, skills, and custom subagents, then report the installed files and validation results.
 ```
 
-That is the intended public experience: users should not need to understand the file layout before installation. The agent should read `INSTALL.md`, clone or fetch the repo, install into user-level Claude Code configuration locations (`~/.claude/`), validate the result, and report what changed.
+That is the intended public experience: users should not need to understand the file layout before installation. The agent should read `INSTALL.md`, clone or fetch the repository, install into user-level Claude Code configuration locations under the resolved Claude Code home, validate the result, and report what changed.
 
 For users who already pasted the global instructions into their global `CLAUDE.md` manually, use support-only mode:
 
@@ -56,7 +58,7 @@ I already added the global custom instructions manually. Follow INSTALL.md, but 
 
 ### Agent install
 
-Ask your coding agent to install the repo URL and follow `INSTALL.md`.
+Ask your coding agent to install the repository URL and follow `INSTALL.md`.
 
 ### Manual install: macOS / Linux / WSL
 
@@ -98,7 +100,7 @@ Dry run:
 pwsh -ExecutionPolicy Bypass -File install/install.ps1 -Full -DryRun
 ```
 
-### Repo-specific guidance
+### Repository-specific guidance
 
 Copy this template into individual projects as a starting point:
 
@@ -120,6 +122,7 @@ AI coding agents are powerful, but they often fail in predictable ways:
 - They trust editor diagnostics over real builds.
 - They claim tests passed when they did not run them.
 - They delegate poorly or blindly accept subagent output.
+- They allow parallel sessions to develop incompatible contracts or ownership.
 - They turn every task into a context dump instead of a focused engineering loop.
 
 This playbook gives Claude Code a durable operating model:
@@ -128,7 +131,7 @@ This playbook gives Claude Code a durable operating model:
 Understand → Plan → Implement → Verify → Review → Report
 ```
 
-The intent is not to make the agent slower for its own sake. The intent is to make it **less wrong**, especially on real repositories with existing conventions and local changes.
+The intent is not to make the agent slower for its own sake. The intent is to make it **less wrong**, especially on real repositories with existing conventions, local changes, and concurrent work.
 
 ---
 
@@ -139,11 +142,11 @@ The intent is not to make the agent slower for its own sake. The intent is to ma
 | Install guide | `INSTALL.md` | Agent-readable install contract for one-prompt installation. |
 | Install scripts | `install/` | Manual installers for Unix-like shells and PowerShell. |
 | Global instructions | `custom-instructions/` | Tool-agnostic behavior rules for elegant, maintainable code. Paste into your global `CLAUDE.md`. |
-| Setup prompt | `claude-prompts/` | Prompt for creating user-level references, skills, and subagents. |
-| Reference docs | `references/` | Routing, subagent delegation, and reusable project-doc templates. |
-| Skills | `skills/` | Reusable workflows for orchestration, doc routing, and senior review. |
+| Prompts | `claude-prompts/` | Setup and active-project coordination prompts. |
+| Reference docs | `references/` | Model, effort, permission, and isolation routing; subagent delegation; multi-session coordination; and reusable project-doc templates. |
+| Skills | `skills/` | Reusable workflows for orchestration, session coordination, document routing, and senior review. |
 | Custom agents | `agents/` | Claude Code subagent definitions for exploration, review, docs research, test triage, and isolated implementation. |
-| Repo guidance | `CLAUDE.md` | Instructions for maintaining this public playbook repository. |
+| Repository guidance | `CLAUDE.md` | Instructions for maintaining this public playbook repository. |
 
 ---
 
@@ -165,7 +168,7 @@ Support-only mode avoids duplicating the full instruction file and installs only
 
 ## Core Philosophy
 
-The main agent is the senior engineer and orchestrator.
+The main Claude Code session is the senior engineer and orchestrator.
 
 It owns:
 
@@ -173,38 +176,109 @@ It owns:
 - the working plan
 - architecture and design judgment
 - delegation decisions
+- parallel-session coordination
 - final implementation
 - final diff
 - validation strategy
 - final response
 
-Subagents can help, but they do not own the outcome. Their job is to return bounded findings with evidence. The main agent must verify before accepting.
+Subagents can help, but they do not own the outcome. Their job is to return bounded findings with evidence. Independent Claude Code sessions may own separate workstreams, but the coordinating session still owns compatibility and integration decisions.
 
-> Use subagents when they create leverage. Do not use them just because they are available.
+> Use subagents and parallel sessions when they create leverage. Do not use them merely because they are available.
 
 ---
 
 ## Subagent Model
 
-This playbook treats Claude Code subagents like focused engineering assistants, not autonomous owners. Each one is defined as a `.md` file with YAML frontmatter under `agents/`, and each restricts its `tools:` list to match its role.
+This playbook treats Claude Code subagents as focused engineering assistants, not autonomous owners. Each one is defined as a Markdown file with YAML frontmatter under `agents/` and explicitly sets its Claude model, effort level, permission mode, and minimum tool permissions.
 
-| Subagent | Tools | Best for |
-| --- | --- | --- |
-| `read-only-explorer` | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and insertion points. |
-| `senior-reviewer` | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
-| `docs-researcher` | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
-| `test-triager` | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
-| `isolated-worker` | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
+| Subagent | Model | Effort | Permission | Tools | Best for |
+| --- | --- | --- | --- | --- | --- |
+| `read-only-explorer` | Haiku | Low | Plan | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and insertion points. |
+| `senior-reviewer` | Sonnet | High | Plan | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
+| `docs-researcher` | Haiku | Low | Plan | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
+| `test-triager` | Sonnet | Medium | Default | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
+| `isolated-worker` | Sonnet | Medium | Default | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
 
-When model selection is available, the orchestrator should right-size the model for each subagent task. Use cheaper or faster models for bounded, low-risk, easily verifiable work. Use stronger reasoning models for meaningful review, ambiguous debugging, security-sensitive work, high-impact changes, and implementation work whose mistakes would be expensive to miss.
+Model, effort, permission, and tool routing is mandatory. The configured profiles prevent routine work from unintentionally inheriting broader main-session settings. Opus, higher effort, broader permissions, or worktree isolation must be justified and independently verified.
+
+Worktree isolation is not enabled globally because an isolated subagent may start from the repository's default branch instead of the parent session's current `HEAD`. Use it only when the assignment's required base state is explicit.
+
+See:
+
+```text
+references/model-routing.md
+references/subagents.md
+skills/subagent-orchestration/SKILL.md
+```
 
 The delegation rule is simple:
 
 ```text
-Precise assignment → Evidence-backed output → Main-agent verification → Accept or reject
+Precise assignment → Evidence-backed output → Main-session verification → Accept or reject
 ```
 
-A good subagent prompt includes role, goal, context, model/reasoning guidance, scope, non-goals, permissions, required evidence, output format, and stop conditions.
+A good subagent prompt includes role, selected profile or model, effort, permission mode, tool boundary, goal, context, scope, non-goals, required evidence, escalation conditions, output format, and stop conditions.
+
+---
+
+## Coordinating Parallel Claude Code Sessions
+
+Subagents are delegated from one main session. Independent Claude Code sessions may already have separate conversation history, branches, worktrees, assumptions, and implementation ownership.
+
+Use the multi-session coordination workflow when related project work is happening in parallel:
+
+```text
+Current project directory
+    ↓
+Sessions active within the previous 72 hours
+    ↓
+Other worktrees, branches, pull requests, and unmerged changes
+    ↓
+Shared change map and conflict detection
+    ↓
+Ownership, sequencing, and integration verification
+```
+
+Repository state takes precedence over recency. Older work still matters when it remains unmerged, incomplete, blocked, contract-relevant, or otherwise active.
+
+New project sessions should use this naming format:
+
+```text
+Project - Three-to-Four-Word Description
+```
+
+Examples:
+
+```text
+ArcLedger - Validate Billing Evidence
+LoreBound - Implement Campaign Imports
+```
+
+Use Claude Code's native session naming controls:
+
+```text
+claude -n "Project - Three-to-Four-Word Description"
+/rename Project - Three-to-Four-Word Description
+```
+
+The project name should be detected automatically, and the description should be derived from the primary objective. If the current environment cannot rename the session directly, it should return the exact recommended name and `/rename` command rather than claiming the rename occurred.
+
+Start the workflow with:
+
+```text
+claude-prompts/coordinate-active-project-work.md
+```
+
+Supporting files:
+
+```text
+references/multi-session-coordination.md
+references/templates/active-work-record.md
+skills/multi-session-coordination/SKILL.md
+```
+
+The optional active-work record gives repositories a local fallback when complete session-history discovery is unavailable. It is advisory and must be verified against current session and repository evidence.
 
 ---
 
@@ -212,21 +286,23 @@ A good subagent prompt includes role, goal, context, model/reasoning guidance, s
 
 Large documents are useful only when routed correctly.
 
-The main agent should:
+The main session should:
 
 1. Identify which docs matter for the task.
 2. Read only relevant sections when possible.
 3. Classify docs as authoritative, advisory, or historical.
-4. Pass only relevant context to subagents.
+4. Pass only relevant context to subagents or active project sessions.
 5. Resolve conflicts using primary evidence.
 
-Primary evidence includes current code, tests, schemas, configuration, logs, build output, typecheck output, runtime behavior, and authoritative external documentation.
+Primary evidence includes current code, tests, schemas, configuration, logs, build output, typecheck output, runtime behavior, relevant session evidence, and authoritative external documentation.
 
 See:
 
 ```text
+references/model-routing.md
 references/reference-doc-routing.md
 references/subagents.md
+references/multi-session-coordination.md
 ```
 
 ---
@@ -249,6 +325,7 @@ references/subagents.md
 │   ├── senior-reviewer.md
 │   └── test-triager.md
 ├── claude-prompts/
+│   ├── coordinate-active-project-work.md
 │   └── setup-global-claude-support-system.md
 ├── custom-instructions/
 │   └── global-coding-agent-instructions.md
@@ -257,9 +334,12 @@ references/subagents.md
 │   └── install.sh
 ├── references/
 │   ├── README.md
+│   ├── model-routing.md
+│   ├── multi-session-coordination.md
 │   ├── reference-doc-routing.md
 │   ├── subagents.md
 │   └── templates/
+│       ├── active-work-record.md
 │       ├── api-contracts.md
 │       ├── architecture.md
 │       ├── data-model.md
@@ -269,6 +349,8 @@ references/subagents.md
 │       ├── security.md
 │       └── testing.md
 └── skills/
+    ├── multi-session-coordination/
+    │   └── SKILL.md
     ├── reference-doc-routing/
     │   └── SKILL.md
     ├── senior-code-review/
@@ -293,6 +375,9 @@ Better delegation:
 Role:
 You are the read-only-explorer subagent for this task.
 
+Selected profile:
+read-only-explorer — Haiku, low effort, plan mode.
+
 Goal:
 Find where checkout tax is calculated and identify the smallest safe insertion point for a customer exemption flag.
 
@@ -306,7 +391,7 @@ Evidence required:
 Return file paths, function names, call chain, relevant tests, and existing exemption concepts.
 ```
 
-The main agent still decides the design, applies or rejects recommendations, and verifies the final diff.
+The main session still decides the design, applies or rejects recommendations, and verifies the final diff.
 
 ---
 
@@ -315,19 +400,20 @@ The main agent still decides the design, applies or rejects recommendations, and
 ```text
 1. Ask your coding agent to install this repository URL.
 2. Let the installer configure global instructions, references, skills, and subagents.
-3. Add repo-specific CLAUDE.md guidance to each project.
-4. For non-trivial work, let the main agent plan first.
-5. Delegate only bounded work with clear evidence requirements.
-6. Verify the final diff before accepting completion.
+3. Add repository-specific CLAUDE.md guidance to each project.
+4. For non-trivial work, let the main session plan first.
+5. Delegate only bounded work with explicit model, effort, permission, tool, and evidence requirements.
+6. When independent project sessions run in parallel, use the multi-session coordination skill.
+7. Verify the final combined diff before accepting completion.
 ```
 
 ---
 
-## Public Repo Notes
+## Public Repository Notes
 
 This repository is public so others can star it, fork it, adapt it, and propose improvements.
 
-Please keep contributions generic, reusable, and safe for public use. Do not add private project details, internal URLs, sensitive access material, local machine quirks, or one-off incident logs.
+Please keep contributions generic, reusable, and safe for public use. Do not add private project details, internal URLs, sensitive access material, local machine quirks, full session transcripts, or one-off incident logs.
 
 See `CONTRIBUTING.md` for contribution guidance.
 
