@@ -1,26 +1,26 @@
 # Claude Code Subagent Model Routing
 
-The main agent must explicitly route each delegated task to the smallest model likely to complete it reliably.
+The main agent must explicitly route each delegated task to the smallest Claude model and lowest effort level likely to complete it reliably.
 
 This is an execution rule, not a suggestion.
 
 ## Why Explicit Routing Is Required
 
-Claude Code subagents use `inherit` when the `model` field is omitted. That can cause routine subagents to use the same expensive model as the main conversation.
+Claude Code subagents use `inherit` when the `model` field is omitted, and inherit the session effort level when `effort` is omitted. That can cause routine subagents to use the same expensive model and effort as the main conversation.
 
-The installed agent profiles therefore pin explicit model aliases. Do not remove those fields without an explicit maintainer decision.
+The installed agent profiles therefore pin explicit Claude model aliases and effort levels. Do not remove those fields without an explicit maintainer decision.
 
 ## Default Profiles
 
-| Profile | Model | Intended work |
-| --- | --- | --- |
-| `read-only-explorer` | `haiku` | Focused repository exploration, call-site mapping, and pattern discovery. |
-| `docs-researcher` | `haiku` | Focused repository and authoritative documentation lookup. |
-| `test-triager` | `sonnet` | Bounded test diagnosis, log analysis, and targeted diagnostic edits. |
-| `isolated-worker` | `sonnet` | Small, isolated, well-specified implementation. |
-| `senior-reviewer` | `sonnet` | Evidence-backed review with escalation for high-impact judgment. |
+| Profile | Model | Effort | Intended work |
+| --- | --- | --- | --- |
+| `read-only-explorer` | `haiku` | `low` | Focused repository exploration, call-site mapping, and pattern discovery. |
+| `docs-researcher` | `haiku` | `low` | Focused repository and authoritative documentation lookup. |
+| `test-triager` | `sonnet` | `medium` | Bounded test diagnosis, log analysis, and targeted diagnostic edits. |
+| `isolated-worker` | `sonnet` | `medium` | Small, isolated, well-specified implementation. |
+| `senior-reviewer` | `sonnet` | `high` | Evidence-backed review with escalation for high-impact judgment. |
 
-These are supporting agents. The main orchestrator retains architecture ownership and final judgment.
+These are supporting agents. The main Claude Code conversation retains architecture ownership and final judgment.
 
 ## Selection Rules
 
@@ -29,12 +29,12 @@ Before spawning a subagent:
 1. Confirm delegation creates real leverage.
 2. Bound the goal, scope, permissions, and evidence requirements.
 3. Choose the profile whose role most closely matches the task.
-4. Use the configured model instead of `inherit`.
-5. State why the selected profile is sufficient.
+4. Use the configured Claude model and effort instead of inherited settings.
+5. State why the selected profile and effort are sufficient.
 6. Define the conditions that require stopping and escalation.
 7. Define how the main agent will independently verify the result.
 
-When two profiles appear suitable, choose Haiku or the more constrained profile.
+When two profiles appear suitable, choose Haiku or the more constrained profile when it can complete the task reliably.
 
 ## Keep With the Main Agent
 
@@ -64,13 +64,14 @@ A subagent must stop and report when:
 - the work becomes security-sensitive, destructive, or production-impacting
 - the task requires architectural or cross-system judgment
 
-The subagent must not silently change models or fall back to `inherit`.
+The subagent must not silently change its model or effort, or fall back to inherited settings.
 
-The main agent may rerun a narrowed task with Opus only after documenting:
+The main agent may rerun a narrowed task with Opus or higher effort only after documenting:
 
 - why the configured Haiku or Sonnet profile was insufficient
 - why narrowing or supplying more context did not solve the problem
-- what evidence the stronger agent must return
+- what model and effort will be used
+- what evidence the stronger run must return
 - how the result will be independently checked
 
 ## Required Assignment Fields
@@ -78,6 +79,7 @@ The main agent may rerun a narrowed task with Opus only after documenting:
 ```text
 Role:
 Selected profile or model:
+Effort level:
 Why this is the smallest suitable choice:
 Goal:
 Context:
@@ -94,8 +96,9 @@ Output format:
 Before accepting delegated work, confirm:
 
 - the model or profile was explicitly selected
+- the effort level was explicitly selected
 - `inherit` was not used unintentionally
-- any Opus escalation was justified
+- any Opus or higher-effort escalation was justified
 - the subagent stayed within scope
 - claims are supported by primary evidence
 - the main agent independently reviewed material findings and edits
