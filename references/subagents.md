@@ -17,17 +17,17 @@ The main session owns:
 
 Use these five Claude Code subagent roles:
 
-| Subagent | Model and effort | Tools | Best for |
-| --- | --- | --- | --- |
-| `read-only-explorer` | Haiku, low | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and likely insertion points. |
-| `senior-reviewer` | Sonnet, high | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
-| `docs-researcher` | Haiku, low | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
-| `test-triager` | Sonnet, medium | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
-| `isolated-worker` | Sonnet, medium | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
+| Subagent | Model and effort | Permission mode | Tools | Best for |
+| --- | --- | --- | --- | --- |
+| `read-only-explorer` | Haiku, low | Plan | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and likely insertion points. |
+| `senior-reviewer` | Sonnet, high | Plan | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
+| `docs-researcher` | Haiku, low | Plan | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
+| `test-triager` | Sonnet, medium | Default | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
+| `isolated-worker` | Sonnet, medium | Default | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
 
-The role names are intentionally Claude Code-specific. They describe the job, model route, and expected tool-permission boundary.
+The role names are intentionally Claude Code-specific. They describe the job, model route, permission baseline, and tool boundary.
 
-Claude Code agent files live under `agents/` as Markdown files with YAML frontmatter. Set `model`, `effort`, and `tools` explicitly. Read-only roles must not include `Edit` or `Write`.
+Claude Code subagent files live under `agents/` as Markdown files with YAML frontmatter. Set `model`, `effort`, `permissionMode`, and `tools` explicitly. Read-only roles must not include `Edit` or `Write`.
 
 ## When to Use Subagents
 
@@ -55,7 +55,7 @@ Avoid subagents when:
 - the work requires one coherent design judgment
 - requirements are still materially ambiguous
 - coordination cost exceeds likely benefit
-- multiple agents would need to edit the same files or tightly coupled areas
+- multiple subagents would need to edit the same files or tightly coupled areas
 - the task involves sensitive access material, destructive operations, production-impacting changes, or sensitive data
 - the main session cannot realistically verify the result
 
@@ -90,21 +90,21 @@ claude -n "Project - Three-to-Four-Word Description"
 
 Detect the project name and derive the concise description from the task instead of asking the user when both are already clear.
 
-## Mandatory Model and Effort Selection
+## Mandatory Model, Effort, and Permission Selection
 
 Consult `references/model-routing.md` before delegation.
 
 Use the configured Claude Code profiles instead of inherited settings:
 
-- Haiku with low effort for focused exploration and documentation lookup
-- Sonnet with medium effort for bounded implementation and test triage
-- Sonnet with high effort for meaningful review
+- Haiku, low effort, plan mode for focused exploration and documentation lookup
+- Sonnet, medium effort, default mode for bounded implementation and test triage
+- Sonnet, high effort, plan mode for meaningful review
 
-The main session remains accountable regardless of which model or effort a subagent uses.
+The main session remains accountable regardless of which model, effort, permission mode, or tool boundary a subagent uses.
 
-Never delegate critical judgment to a weaker model unless the main session can independently verify the result from primary evidence.
+Never delegate critical judgment to a weaker model or broader permission mode unless the main session can independently verify the result from primary evidence.
 
-Do not silently escalate a subagent to Opus or higher effort. Document why the configured profile is insufficient and how the stronger result will be verified.
+Do not silently escalate a subagent to Opus, higher effort, broader permissions, or worktree isolation. Document why the configured profile is insufficient and how the stronger result will be verified.
 
 ## Subagent Assignment Template
 
@@ -120,8 +120,14 @@ Selected profile or model:
 Effort level:
 [low/medium/high as appropriate.]
 
+Permission mode:
+[plan/default or an explicitly approved alternative.]
+
+Tool boundary:
+[Exact tools available to the subagent.]
+
 Why this is the smallest suitable choice:
-[Why the selected model and effort can complete the bounded task reliably.]
+[Why the selected model, effort, permissions, and tools can complete the bounded task reliably.]
 
 Goal:
 [One concrete outcome.]
@@ -140,9 +146,6 @@ Inspect only [files/areas/systems]. Do not work outside this scope unless necess
 
 Non-goals:
 Do not [unwanted work, refactors, formatting churn, unrelated fixes, broad rewrites].
-
-Permissions:
-[Read-only / may edit only X / may run Y checks / do not run expensive or destructive commands.]
 
 Evidence required:
 Return specific file paths, symbols, command output summaries, reproduction steps, docs references, or runtime observations that support your conclusions.
@@ -165,8 +168,9 @@ Before accepting subagent work, the main session must verify:
 
 - the configured profile or Claude model was explicitly selected
 - the effort level was explicitly selected
-- inherited settings were not used unintentionally
-- any Opus or higher-effort escalation was justified
+- the permission mode and tool boundary match the role
+- inherited model or effort settings were not used unintentionally
+- any Opus, higher-effort, broader-permission, or worktree-isolation escalation was justified
 - the subagent stayed within scope
 - the result addresses the assigned goal
 - claims are backed by code, tests, logs, docs, runtime behavior, or other primary evidence
