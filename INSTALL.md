@@ -149,10 +149,11 @@ After installation, verify:
 - `$CLAUDE_HOME/skills/subagent-orchestration/SKILL.md` exists.
 - `$CLAUDE_HOME/skills/multi-session-coordination/SKILL.md` exists.
 - Each `SKILL.md` has `name` and `description` frontmatter.
-- Each `agents/*.md` file has `name`, `description`, `model`, `effort`, and `tools` frontmatter.
-- Read-only roles exclude `Edit` and `Write` from their `tools` frontmatter.
+- Each `agents/*.md` file has `name`, `description`, `model`, `effort`, `permissionMode`, and `tools` frontmatter.
+- Read-only roles use `permissionMode: plan` and exclude `Edit` and `Write` from their `tools` frontmatter.
+- Write-capable bundled roles use `permissionMode: default` unless a different mode has explicit maintainer approval.
 - Agent models use supported Claude Code model aliases rather than inherited or unrelated model identifiers.
-- No non-Claude configuration paths, agent schemas, or command vocabulary were introduced.
+- No non-Claude configuration paths, subagent schemas, or command vocabulary were introduced.
 
 ## Uninstall
 
