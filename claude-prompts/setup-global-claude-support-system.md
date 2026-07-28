@@ -12,7 +12,7 @@ Do not duplicate those full instructions elsewhere.
 Your job is to create the supporting global system only:
 
 - global reference documents
-- Claude model and effort routing docs
+- Claude model, effort, and permission routing docs
 - reference document routing docs
 - subagent delegation docs
 - multi-session coordination docs
@@ -52,7 +52,7 @@ Before writing anything:
 6. If replacement is necessary, create a timestamped backup next to the file.
 7. Do not store sensitive access material, private local paths, full session transcripts, or long incident logs.
 8. Keep everything tool-agnostic where it is not explicitly Claude-Code-specific.
-9. Use only Claude Code file names, configuration paths, agent schemas, model aliases, effort fields, tool names, and session commands.
+9. Use only Claude Code file names, configuration paths, subagent schemas, model aliases, effort fields, permission modes, tool names, and session commands.
 10. Do not ask me questions unless you are blocked. Make reasonable assumptions and report them.
 
 ## Desired Global Structure
@@ -95,17 +95,21 @@ $CLAUDE_HOME/
     isolated-worker.md
 ```
 
-Each agent file under `$GLOBAL_AGENTS_HOME` must have YAML frontmatter with `name`, `description`, `model`, `effort`, and `tools`, followed by the system-prompt body.
+Each agent file under `$GLOBAL_AGENTS_HOME` must have YAML frontmatter with `name`, `description`, `model`, `effort`, `permissionMode`, and `tools`, followed by the system-prompt body.
 
 Use these Claude Code routes unless the installed version requires a documented compatible adjustment:
 
-- `read-only-explorer`: Haiku, low effort; Read, Grep, Glob
-- `docs-researcher`: Haiku, low effort; Read, Grep, Glob, WebFetch, WebSearch
-- `test-triager`: Sonnet, medium effort; Read, Grep, Glob, Bash, Edit
-- `isolated-worker`: Sonnet, medium effort; Read, Grep, Glob, Edit, Write, Bash
-- `senior-reviewer`: Sonnet, high effort; Read, Grep, Glob, Bash
+- `read-only-explorer`: Haiku, low effort, plan permission mode; Read, Grep, Glob
+- `docs-researcher`: Haiku, low effort, plan permission mode; Read, Grep, Glob, WebFetch, WebSearch
+- `test-triager`: Sonnet, medium effort, default permission mode; Read, Grep, Glob, Bash, Edit
+- `isolated-worker`: Sonnet, medium effort, default permission mode; Read, Grep, Glob, Edit, Write, Bash
+- `senior-reviewer`: Sonnet, high effort, plan permission mode; Read, Grep, Glob, Bash
 
 Set `tools` to the minimum set the role needs. Read-only roles must not include `Edit` or `Write`.
+
+Do not enable `acceptEdits`, `auto`, `dontAsk`, or `bypassPermissions` in bundled profiles without an explicit maintainer-approved use case and risk analysis.
+
+Do not set `isolation: worktree` globally. Use it only for assignments whose required base state is explicit, because an isolated subagent worktree may not include current-session changes.
 
 Do not create custom agents with names that shadow Claude Code's built-in agent types. Use the custom names listed above.
 
@@ -136,7 +140,7 @@ The pointer section should be:
 Supporting global reference documents live under the resolved Claude Code home references directory:
 
 - `references/README.md` — map of available global reference docs
-- `references/model-routing.md` — mandatory Claude model-selection, effort, escalation, and acceptance rules
+- `references/model-routing.md` — mandatory Claude model, effort, permission, escalation, and acceptance rules
 - `references/subagents.md` — subagent delegation rules, assignment template, and acceptance checklist
 - `references/multi-session-coordination.md` — session discovery, naming, ownership, sequencing, conflict detection, and integration guidance
 - `references/reference-doc-routing.md` — how to decide which docs to consult and how to treat them
@@ -181,7 +185,7 @@ Use the contents from this repository as the canonical source for:
 - `skills/*/SKILL.md`
 - `agents/*.md`
 
-Preserve the same intent, names, descriptions, Claude models, effort levels, tools, and instructions. If the installed Claude Code version uses a different supported subagent or skill schema, adapt only as necessary and report the exact adjustment.
+Preserve the same intent, names, descriptions, Claude models, effort levels, permission modes, tools, and instructions. If the installed Claude Code version uses a different supported subagent or skill schema, adapt only as necessary and report the exact adjustment.
 
 ## Validation
 
@@ -189,16 +193,17 @@ After creating or updating files:
 
 1. Print the resulting file tree for `$CLAUDE_HOME`, `$GLOBAL_REFERENCES_HOME`, `$GLOBAL_SKILLS_HOME`, and `$GLOBAL_AGENTS_HOME`.
 2. Confirm no repository files were modified.
-3. Confirm each agent Markdown file has valid YAML frontmatter with `name`, `description`, `model`, `effort`, and `tools`.
-4. Confirm read-only roles exclude `Edit` and `Write`.
-5. Confirm each `SKILL.md` has YAML frontmatter with `name` and `description`.
-6. Confirm the expected agent files exist: `read-only-explorer.md`, `senior-reviewer.md`, `docs-researcher.md`, `test-triager.md`, and `isolated-worker.md`.
-7. Confirm `references/model-routing.md`, `references/multi-session-coordination.md`, `references/templates/active-work-record.md`, and `skills/multi-session-coordination/SKILL.md` exist.
-8. Confirm only Claude Code paths, commands, model aliases, effort fields, tool names, and agent schemas were installed.
-9. Report any files backed up.
-10. Report any files skipped and why.
-11. Report any assumptions.
-12. Report whether the small `CLAUDE.md` pointer section was created, updated, already present, or skipped.
+3. Confirm each agent Markdown file has valid YAML frontmatter with `name`, `description`, `model`, `effort`, `permissionMode`, and `tools`.
+4. Confirm read-only roles use `permissionMode: plan` and exclude `Edit` and `Write`.
+5. Confirm write-capable bundled roles use `permissionMode: default`.
+6. Confirm each `SKILL.md` has YAML frontmatter with `name` and `description`.
+7. Confirm the expected agent files exist: `read-only-explorer.md`, `senior-reviewer.md`, `docs-researcher.md`, `test-triager.md`, and `isolated-worker.md`.
+8. Confirm `references/model-routing.md`, `references/multi-session-coordination.md`, `references/templates/active-work-record.md`, and `skills/multi-session-coordination/SKILL.md` exist.
+9. Confirm only Claude Code paths, commands, model aliases, effort fields, permission modes, tool names, and subagent schemas were installed.
+10. Report any files backed up.
+11. Report any files skipped and why.
+12. Report any assumptions.
+13. Report whether the small `CLAUDE.md` pointer section was created, updated, already present, or skipped.
 
 Final response format:
 
