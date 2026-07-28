@@ -1,11 +1,11 @@
 ---
 name: subagent-orchestration
-description: Use when a coding task may benefit from Claude Code subagents for codebase exploration, review, docs research, test triage, or isolated implementation. Enforces task-sized model and effort routing, bounded delegation, and main-agent verification.
+description: Use when a coding task may benefit from Claude Code subagents for codebase exploration, review, docs research, test triage, or isolated implementation. Enforces task-sized model and effort routing, bounded delegation, and main-session verification.
 ---
 
 # Subagent Orchestration Skill
 
-The main agent is the senior developer and orchestrator. Subagents assist but do not own the outcome.
+The main Claude Code session is the senior developer and orchestrator. Subagents assist but do not own the outcome.
 
 Use this skill when:
 
@@ -22,7 +22,10 @@ Do not use this skill when:
 - one coherent design judgment is required
 - requirements are materially unclear
 - subagents would edit the same files
-- the main agent cannot verify the result
+- the main session cannot verify the result
+- multiple independent Claude Code sessions are already implementing related work
+
+When multiple independent project sessions need discovery, conflict detection, ownership, sequencing, or integration guidance, use the `multi-session-coordination` skill instead. Do not spawn additional implementation subagents merely to solve an existing session-coordination conflict.
 
 ## Mandatory Model and Effort Routing
 
@@ -34,7 +37,7 @@ Before spawning a subagent, consult `references/model-routing.md` when available
 - Prefer Haiku with low effort for read-only exploration and focused documentation lookup.
 - Prefer Sonnet with medium effort for bounded implementation and test triage.
 - Prefer Sonnet with high effort for meaningful review.
-- Keep architecture, security-sensitive judgment, destructive operations, migrations, complex concurrency, and other high-impact decisions with the main orchestrator unless Opus or higher effort is explicitly justified.
+- Keep architecture, security-sensitive judgment, destructive operations, migrations, complex concurrency, and other high-impact decisions with the main session unless Opus or higher effort is explicitly justified.
 - A subagent must stop and report a capability gap; it must not silently change its model or effort, or fall back to inherited settings.
 - If a stronger model or effort is selected, record why the configured profile is insufficient and how the result will be independently verified.
 
