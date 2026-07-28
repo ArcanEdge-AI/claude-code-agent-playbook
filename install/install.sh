@@ -144,7 +144,7 @@ else
 Supporting global reference documents live under the Claude Code home references directory:
 
 - `references/README.md` — map of available global reference docs
-- `references/model-routing.md` — mandatory Claude model-selection, effort, escalation, and acceptance rules
+- `references/model-routing.md` — mandatory Claude model, effort, permission, isolation, escalation, and acceptance rules
 - `references/subagents.md` — Claude Code subagent delegation rules, assignment template, and acceptance checklist
 - `references/multi-session-coordination.md` — Claude Code session discovery, naming, ownership, sequencing, conflict detection, and integration guidance
 - `references/reference-doc-routing.md` — how to decide which docs to consult and how to treat them
@@ -213,6 +213,7 @@ for agent in "$CLAUDE_HOME/agents"/*.md; do
     && grep -q '^description:' "$agent" \
     && grep -q '^model:' "$agent" \
     && grep -q '^effort:' "$agent" \
+    && grep -q '^permissionMode:' "$agent" \
     && grep -q '^tools:' "$agent"; then
     say "OK Claude Code frontmatter: $agent"
   else
