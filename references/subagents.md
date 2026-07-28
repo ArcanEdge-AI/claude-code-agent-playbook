@@ -1,8 +1,8 @@
 # Subagent Delegation Reference
 
-The main agent is the orchestrator and senior developer. Subagents may assist, but they do not own the final outcome.
+The main Claude Code session is the orchestrator and senior developer. Subagents may assist, but they do not own the final outcome.
 
-The main agent owns:
+The main session owns:
 
 - task understanding
 - working plan
@@ -17,17 +17,17 @@ The main agent owns:
 
 Use these five Claude Code subagent roles:
 
-| Subagent | Tools | Best for |
-| --- | --- | --- |
-| `read-only-explorer` | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and likely insertion points. |
-| `senior-reviewer` | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
-| `docs-researcher` | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
-| `test-triager` | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
-| `isolated-worker` | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
+| Subagent | Model and effort | Tools | Best for |
+| --- | --- | --- | --- |
+| `read-only-explorer` | Haiku, low | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and likely insertion points. |
+| `senior-reviewer` | Sonnet, high | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
+| `docs-researcher` | Haiku, low | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
+| `test-triager` | Sonnet, medium | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
+| `isolated-worker` | Sonnet, medium | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
 
-The role names are intentionally Claude Code-specific. They describe both the job and the expected tool-permission boundary.
+The role names are intentionally Claude Code-specific. They describe the job, model route, and expected tool-permission boundary.
 
-Claude Code agent files live under `agents/` as Markdown files with YAML frontmatter. Set each `tools:` list to the minimum set the role needs. Read-only roles should not include `Edit` or `Write`.
+Claude Code agent files live under `agents/` as Markdown files with YAML frontmatter. Set `model`, `effort`, and `tools` explicitly. Read-only roles must not include `Edit` or `Write`.
 
 ## When to Use Subagents
 
@@ -57,41 +57,54 @@ Avoid subagents when:
 - coordination cost exceeds likely benefit
 - multiple agents would need to edit the same files or tightly coupled areas
 - the task involves sensitive access material, destructive operations, production-impacting changes, or sensitive data
-- the main agent cannot realistically verify the result
+- the main session cannot realistically verify the result
 
 Prefer read-only subagents for exploration, review, research, reproduction, and diagnosis.
 
-Be careful with write-heavy parallel work. Do not allow multiple agents to edit the same files or tightly coupled areas at the same time unless the user explicitly asks and the conflict risk is acceptable.
+Be careful with write-heavy parallel work. Do not allow multiple subagents to edit the same files or tightly coupled areas at the same time unless the user explicitly asks and the conflict risk is acceptable.
 
-## Model Selection for Subagents
+## Independent Claude Code Sessions
 
-When model selection is available, the main agent should right-size the model and reasoning effort for each delegated task.
+Independent Claude Code sessions are not ordinary subagents. They may have separate conversation history, branches, worktrees, assumptions, and implementation ownership.
 
-Use cheaper or faster models for bounded, low-risk, easily verifiable work, such as:
+When multiple independent sessions are already working on related project areas:
 
-- simple codebase lookup
-- file inventory
-- call-site enumeration
-- straightforward documentation lookup
-- formatting checks
-- mechanical audits
-- simple test-log summarization
+- consult `references/multi-session-coordination.md`
+- use the `multi-session-coordination` skill
+- identify shared ownership, dependencies, contracts, and integration risks before adding more parallel implementation work
+- do not treat one session's summary as authoritative without checking primary evidence
+- do not spawn additional implementation subagents merely to solve an existing session-coordination conflict
 
-Use stronger reasoning models for work involving:
+New project sessions should use:
 
-- meaningful code review
-- ambiguous debugging
-- security-sensitive or access-control-sensitive review
-- complex test triage
-- high-impact isolated implementation
-- data migrations
-- concurrency, caching, or background jobs
-- public API behavior
-- final review of meaningful changes
+```text
+Project - Three-to-Four-Word Description
+```
 
-The orchestrator remains accountable regardless of which model a subagent uses.
+Use Claude Code's native naming controls when available:
 
-Never delegate critical judgment to a weaker model unless the main agent can independently verify the result from primary evidence.
+```text
+claude -n "Project - Three-to-Four-Word Description"
+/rename Project - Three-to-Four-Word Description
+```
+
+Detect the project name and derive the concise description from the task instead of asking the user when both are already clear.
+
+## Mandatory Model and Effort Selection
+
+Consult `references/model-routing.md` before delegation.
+
+Use the configured Claude Code profiles instead of inherited settings:
+
+- Haiku with low effort for focused exploration and documentation lookup
+- Sonnet with medium effort for bounded implementation and test triage
+- Sonnet with high effort for meaningful review
+
+The main session remains accountable regardless of which model or effort a subagent uses.
+
+Never delegate critical judgment to a weaker model unless the main session can independently verify the result from primary evidence.
+
+Do not silently escalate a subagent to Opus or higher effort. Document why the configured profile is insufficient and how the stronger result will be verified.
 
 ## Subagent Assignment Template
 
@@ -101,14 +114,20 @@ Use this structure when delegating:
 Role:
 You are the [read-only-explorer/senior-reviewer/docs-researcher/test-triager/isolated-worker] subagent for this task.
 
+Selected profile or model:
+[Claude Code profile or Claude model alias.]
+
+Effort level:
+[low/medium/high as appropriate.]
+
+Why this is the smallest suitable choice:
+[Why the selected model and effort can complete the bounded task reliably.]
+
 Goal:
 [One concrete outcome.]
 
 Context:
 [Relevant user request, repository constraints, current findings, and branch/diff context.]
-
-Model / reasoning guidance:
-Use [cheaper/faster/standard/stronger] model because [why]. Escalate if the task becomes ambiguous, high-risk, or impossible to verify.
 
 Reference documents:
 Consult [document/path/section] for context on [topic].
@@ -128,18 +147,26 @@ Permissions:
 Evidence required:
 Return specific file paths, symbols, command output summaries, reproduction steps, docs references, or runtime observations that support your conclusions.
 
+Escalation conditions:
+Stop and report if [conditions requiring main-session or stronger-model judgment].
+
 Output format:
 - Findings:
 - Evidence:
 - Recommended action:
 - Risks/uncertainty:
 - Validation run:
+- Escalation needed:
 ```
 
 ## Acceptance Checklist
 
-Before accepting subagent work, the main agent must verify:
+Before accepting subagent work, the main session must verify:
 
+- the configured profile or Claude model was explicitly selected
+- the effort level was explicitly selected
+- inherited settings were not used unintentionally
+- any Opus or higher-effort escalation was justified
 - the subagent stayed within scope
 - the result addresses the assigned goal
 - claims are backed by code, tests, logs, docs, runtime behavior, or other primary evidence
@@ -147,7 +174,7 @@ Before accepting subagent work, the main agent must verify:
 - no unrelated files were changed
 - the implementation matches existing architecture and style
 - validation was run, or a clear reason was given
-- the main agent has inspected the final diff itself
+- the main session inspected the final diff itself
 
 If subagent findings conflict, resolve the disagreement by inspecting primary evidence.
 
