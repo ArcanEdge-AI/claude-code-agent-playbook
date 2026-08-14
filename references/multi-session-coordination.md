@@ -153,10 +153,12 @@ For every relevant work item, record:
 - files and modules affected
 - APIs, events, routes, or shared interfaces affected
 - schemas, migrations, or persistence affected
-- dependencies added or changed
+- software or service dependencies added or changed
+- accepted upstream work artifacts or decisions required before the item can begin or integrate
 - tests added, changed, or invalidated
+- handoff and integration verification gates
 - assumptions
-- blockers
+- unmet upstream dependencies and other blockers
 - open decisions
 - merge or integration status
 
@@ -225,6 +227,7 @@ When work overlaps, the coordinator must establish:
 - which implementation must adapt to an established contract
 - required integration checkpoints
 - required validation before the next dependent change begins
+- the remaining chain of blocking work that controls integration completion
 
 Do not tell sessions only to “coordinate.” State the exact ownership, dependency, contract, or sequencing decision.
 
@@ -292,6 +295,8 @@ A repository may maintain optional active-work records under:
 ```
 
 Use `references/templates/active-work-record.md` as the starting point.
+
+In that record, `dependencies` names required upstream work artifacts or decisions, `blocked_by` lists dependencies that are not yet satisfied, `owned_paths` records write ownership, and `validation_required` defines the gates that must pass before integration-ready status. Do not introduce synonymous fields unless a concrete consumer requires them.
 
 These records are advisory coordination aids. Verify them against current session evidence, Git state, code, tests, and pull requests before relying on them.
 

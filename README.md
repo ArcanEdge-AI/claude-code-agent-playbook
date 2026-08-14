@@ -186,6 +186,8 @@ Subagents can help, but they do not own the outcome. Their job is to return boun
 
 > Use subagents and parallel sessions when they create leverage. Do not use them merely because they are available.
 
+For work with multiple delegable parts, the main session maps bounded work nodes, real blocking dependencies, write ownership or read scope, and verification gates before fan-out. Independent nodes may run concurrently only when their permission and tool boundaries are sufficient, isolation exists, and coordination cost is justified. Small tasks remain simple and sequential.
+
 ---
 
 ## Subagent Model
@@ -219,6 +221,8 @@ Precise assignment → Evidence-backed output → Main-session verification → 
 ```
 
 A good subagent prompt includes role, selected profile or model, effort, permission mode, tool boundary, goal, context, scope, non-goals, required evidence, escalation conditions, output format, and stop conditions.
+
+For multi-node work, it also identifies the node, its inputs and accepted output, blocking dependencies, ownership or read scope, and verification gate. The orchestration skill explains safe fan-out, base-state and isolation checks, handoff validation, selective retries, and final combined validation.
 
 ---
 
@@ -402,9 +406,10 @@ The main session still decides the design, applies or rejects recommendations, a
 2. Let the installer configure global instructions, references, skills, and subagents.
 3. Add repository-specific CLAUDE.md guidance to each project.
 4. For non-trivial work, let the main session plan first.
-5. Delegate only bounded work with explicit model, effort, permission, tool, and evidence requirements.
-6. When independent project sessions run in parallel, use the multi-session coordination skill.
-7. Verify the final combined diff before accepting completion.
+5. For multi-node work, identify real blocking dependencies, parallel-safe nodes, ownership, and verification gates.
+6. Delegate only bounded work with explicit model, effort, permission, tool, and evidence requirements.
+7. When independent project sessions run in parallel, use the multi-session coordination skill.
+8. Verify the final combined diff and integrated behavior before accepting completion.
 ```
 
 ---

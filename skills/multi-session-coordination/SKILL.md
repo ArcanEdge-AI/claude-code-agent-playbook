@@ -106,10 +106,12 @@ For each relevant work item, capture:
 - files and modules affected
 - APIs, events, routes, and shared interfaces affected
 - schemas, migrations, and persistence affected
-- dependencies added or changed
+- software or service dependencies added or changed
+- accepted upstream work artifacts or decisions required before the item can begin or integrate
 - tests affected
+- handoff and integration verification gates
 - assumptions
-- blockers
+- unmet upstream dependencies and other blockers
 - open decisions
 - integration status
 
@@ -145,6 +147,7 @@ Define:
 - which shared contract must be fixed before implementation continues
 - which session must adapt to an established interface
 - required integration checkpoints
+- the remaining chain of blocking work that controls integration completion
 
 Prefer the smallest safe coordination change. Do not allow independent redesigns of the same shared subsystem.
 

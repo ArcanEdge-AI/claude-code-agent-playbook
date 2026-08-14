@@ -31,7 +31,7 @@ Primary evidence includes:
 ## Available References
 
 - `model-routing.md` — mandatory Claude model, effort, permission, isolation, escalation, and acceptance rules for subagents.
-- `subagents.md` — rules for when and how to delegate to Claude Code subagents.
+- `subagents.md` — dependency-aware rules for when and how to delegate to Claude Code subagents, verify handoffs, and combine results.
 - `multi-session-coordination.md` — discovery, ownership, sequencing, session naming, conflict detection, and integration guidance for independent Claude Code sessions.
 - `reference-doc-routing.md` — how to choose and classify reference documents.
 - `templates/repository-CLAUDE.md` — starter template for repo-specific `CLAUDE.md` instructions.
@@ -42,7 +42,7 @@ Primary evidence includes:
 - `templates/release.md` — release and deployment template.
 - `templates/api-contracts.md` — API contract template.
 - `templates/data-model.md` — data model and persistence template.
-- `templates/active-work-record.md` — optional repository-local record for active Claude Code session ownership, contracts, dependencies, and validation requirements.
+- `templates/active-work-record.md` — optional repository-local record for active Claude Code session ownership, contracts, upstream work dependencies, blockers, and validation gates.
 
 ## Placement Rules
 

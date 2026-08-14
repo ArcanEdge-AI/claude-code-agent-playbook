@@ -1,6 +1,6 @@
 ---
 name: subagent-orchestration
-description: Use when a coding task may benefit from Claude Code subagents for codebase exploration, review, docs research, test triage, or isolated implementation. Enforces task-sized model, effort, and permission routing, bounded delegation, and main-session verification.
+description: Use when a coding task may benefit from Claude Code subagents for codebase exploration, review, docs research, test triage, or isolated implementation. Enforces dependency-aware decomposition, task-sized model, effort, and permission routing, bounded delegation, and main-session verification.
 ---
 
 # Subagent Orchestration Skill
@@ -27,6 +27,24 @@ Do not use this skill when:
 
 When multiple independent project sessions need discovery, conflict detection, ownership, sequencing, or integration guidance, use the `multi-session-coordination` skill instead. Do not spawn additional implementation subagents merely to solve an existing session-coordination conflict.
 
+## Dependency-Aware Delegation
+
+Keep simple tasks simple. For work with multiple delegable parts, define each candidate work node with:
+
+- a node identifier
+- one bounded goal
+- inputs and authoritative sources
+- an output and acceptance condition
+- only the upstream nodes that block it from starting
+- write ownership or read scope
+- a verification gate proportionate to risk
+
+A dependency exists only when a node cannot correctly begin without an accepted upstream artifact or decision. Identify which nodes are safe to run in parallel and which remaining chain of blocking work controls completion.
+
+Run independent nodes concurrently only when the runtime can isolate them, their writes and mutable state do not conflict, and the coordination cost is justified. State a concurrency limit and rationale instead of assuming unlimited fan-out. Serialize overlapping writers unless verified isolation is available. Treat `isolation: worktree` as safe only when the assignment's required base state is explicit and the isolated worktree is confirmed to start from that state.
+
+While delegated work is running, continue available independent, non-conflicting planning, inspection, integration, or validation work in the main session. Do not wait solely for a subagent when useful work remains. Do not invent parallel work, exceed runtime limits, broaden permission modes, or trade evidence and verification for lower latency.
+
 ## Mandatory Model, Effort, and Permission Routing
 
 Before spawning a subagent, consult `references/model-routing.md` when available.
@@ -49,10 +67,11 @@ Before spawning a subagent, consult `references/model-routing.md` when available
 ## Workflow
 
 1. Clarify the task goal and success criteria.
-2. Decide which work, if any, should be delegated.
-3. Choose from the Claude Code roles: Read-Only Explorer, Senior Reviewer, Docs Researcher, Test Triager, and Isolated Worker.
-4. Select the smallest suitable custom profile or per-invocation Claude model, effort, permission mode, and tool boundary.
-5. Give each subagent a precise assignment:
+2. For multi-node work, map bounded nodes, real blocking dependencies, parallel-safe nodes, the completion-controlling path, and required handoff gates.
+3. Decide which work, if any, should be delegated and whether parallel execution creates real leverage.
+4. Choose from the Claude Code roles: Read-Only Explorer, Senior Reviewer, Docs Researcher, Test Triager, and Isolated Worker.
+5. Select the smallest suitable custom profile or per-invocation Claude model, effort, permission mode, and tool boundary.
+6. Give each subagent a precise assignment:
    - role
    - goal
    - context
@@ -66,10 +85,12 @@ Before spawning a subagent, consult `references/model-routing.md` when available
    - non-goals
    - required evidence
    - output format
-6. Wait for delegated results before accepting conclusions.
-7. Verify subagent claims against primary evidence.
-8. Inspect any changed files yourself.
-9. Accept, reject, revise, or rerun with stronger settings only when justified.
-10. Report relevant subagent usage and any escalation in the final response.
+   - for multi-node work, the node identifier, inputs, output and acceptance condition, blocking dependencies, ownership or read scope, and verification gate
+7. Launch only parallel-safe nodes concurrently and keep write-heavy work sequential unless isolation is verified.
+8. Verify subagent claims against primary evidence. For meaningful implementation, use a separate verification task with only the necessary artifact, criteria, and evidence requirements when the runtime supports it; the main session still decides acceptance.
+9. If a gate fails, revise or rerun the failed node and any downstream nodes whose inputs became invalid. Do not restart unrelated nodes by default.
+10. Before combining results, confirm every required input passed its designated gate, then inspect the combined diff and run validation for the integrated behavior.
+11. Accept, reject, revise, or rerun with stronger settings only when justified.
+12. Report relevant subagent usage, concurrency decisions, and any escalation in the final response.
 
 Never accept a subagent's conclusion solely because it sounds confident.
