@@ -19,6 +19,7 @@ A full install creates or updates this user-level structure:
 ```text
 $CLAUDE_HOME/
   CLAUDE.md
+  .claude-code-agent-playbook-managed-files.tsv
   references/
     README.md
     model-routing.md
@@ -56,7 +57,7 @@ Path resolution:
 
 ### Full install
 
-Use this for most users.
+Use this for normal installs and every normal update. It is the default when no mode flag is provided.
 
 Full install:
 
@@ -65,17 +66,22 @@ Full install:
 - copies custom Claude Code subagent definitions into `$CLAUDE_HOME/agents/`
 - copies skills into `$CLAUDE_HOME/skills/`
 
-If `$CLAUDE_HOME/CLAUDE.md` already exists, preserve content outside the Claude Code Agent Playbook markers. Add the marked section when both markers are absent or replace exactly one well-ordered marked section after a timestamped backup. If only one marker exists, either marker is duplicated, or the end appears before the start, stop without writing the file.
+The global instruction body is always installed inside one clearly marked Claude Code Agent Playbook section. Preserve content outside the markers. Add the marked section when both markers are absent or replace exactly one well-ordered marked section after a timestamped backup. If only one marker exists, either marker is duplicated, or the end appears before the start, stop without writing the file.
+
+After a successful run, the installer writes `$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv` with every managed support-file path and source SHA-256. On later runs, files removed from the repository are backed up and retired only when they still match the previously installed hash. Customized formerly managed files are preserved and reported. Files that were never recorded as playbook-managed are never removed.
+
+The first manifest-aware update has no previous ownership record, so it safely preserves existing unlisted files. Subsequent updates can distinguish unchanged retired files from user customizations.
 
 ### Support-only install
 
-Use this when the user already pasted the global instructions into their global `CLAUDE.md` manually.
+Use this only when the user explicitly requests support-only mode and confirms that the full global instructions already live in their global `CLAUDE.md` manually. Do not infer support-only mode merely because an older installation or an existing `CLAUDE.md` is present.
 
 Support-only install:
 
 - does not duplicate the full global instructions into `$CLAUDE_HOME/CLAUDE.md`
 - adds only a short reference-map pointer if useful
 - still copies reference docs, skills, and custom Claude Code subagent definitions
+- still updates the managed-file manifest and safely retires unchanged files removed from later playbook releases
 
 Support-only reruns use the same marker validation and replacement rules, so installed pointers update without duplicating user-authored content.
 
@@ -132,7 +138,7 @@ When an AI coding agent is asked to install this repository, it should:
 3. Resolve `CLAUDE_HOME`.
 4. Inspect existing target files before writing.
 5. Back up any existing file before changing it.
-6. Use full install unless the user explicitly asks for support-only mode or clearly states that the global instructions already live in their global `CLAUDE.md`.
+6. Use full install for both installation and update unless the user explicitly asks for support-only mode. Existing global instructions, markers, or support files are not permission to change modes.
 7. Copy reference docs, skills, and custom Claude Code subagent definitions to the expected user-level locations.
 8. Validate the installed files and Claude Code YAML frontmatter.
 9. Report exactly what changed, what was skipped, and where backups were written.
@@ -144,6 +150,7 @@ Do not modify arbitrary repositories during installation. Only use a temporary c
 After installation, verify:
 
 - `$CLAUDE_HOME/CLAUDE.md` exists or was intentionally left as a pointer-only file.
+- `$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv` exists and lists every current managed support file once.
 - `$CLAUDE_HOME/references/model-routing.md` exists.
 - `$CLAUDE_HOME/references/subagents.md` exists.
 - `$CLAUDE_HOME/references/worktrees.md` exists.
@@ -174,6 +181,8 @@ After installation, verify:
 - The installed playbook has exactly one managed definition for each of the six listed roles; per-invocation model routing is used instead of model-specific role copies, while effort remains fixed in the selected definition.
 - Routing guidance treats the actual user-selected main-session model as the root ceiling, permits equal-tier children, prohibits descendant upgrades, reserves replacement routing for the root, and rejects silent model substitution.
 - No non-Claude configuration paths, subagent schemas, or command vocabulary were introduced.
+- Every current manifest entry matches its repository source SHA-256.
+- Every formerly managed path was either absent, backed up and retired unchanged, or preserved with an explicit customization warning.
 
 ## Uninstall
 
@@ -183,6 +192,7 @@ To remove it manually, delete:
 
 ```text
 $CLAUDE_HOME/references/
+$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv
 $CLAUDE_HOME/agents/local-orchestrator.md
 $CLAUDE_HOME/agents/read-only-explorer.md
 $CLAUDE_HOME/agents/senior-reviewer.md

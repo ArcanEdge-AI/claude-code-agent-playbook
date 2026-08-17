@@ -1,5 +1,7 @@
 # Prompt: Set Up Global Claude Code Support System
 
+> This is an explicit support-only setup prompt, not a normal installer or updater. For every normal install or update, follow `INSTALL.md` in full mode. Do not select this prompt merely because existing playbook files are present.
+
 Paste this prompt into Claude Code after you have already added the global coding-agent instructions from `custom-instructions/global-coding-agent-instructions.md` to your global `CLAUDE.md`.
 
 ```markdown
@@ -8,6 +10,7 @@ You are configuring my global Claude Code support system.
 Important context:
 I have already added my full global coding-agent instructions to my global CLAUDE.md, the user-level memory file Claude Code loads into every session. Treat that as true even if you cannot inspect it directly in this conversation.
 Do not duplicate those full instructions elsewhere.
+This explicit statement is the authorization for support-only behavior. Without it, stop using this prompt and follow `INSTALL.md` in full mode.
 
 Your job is to create the supporting global system only:
 

@@ -43,6 +43,7 @@ This repo is mostly Markdown, with a small set of YAML frontmatter blocks in ski
 - Confirm the docs cover Opus, Sonnet, and Haiku roots; equal-tier children; no forced tier drop; root-only stronger replacements within the actual root ceiling; and unknown or unavailable model handling.
 - Confirm links and paths in `README.md` match the repository tree.
 - Confirm install docs and scripts reference the current Claude Code subagent files.
+- Confirm PowerShell and Bash installers default normal installs and updates to full mode, create a marked global section on first install, maintain the managed-file manifest, retire only unchanged formerly managed files, and preserve customized or unrelated files.
 - Confirm installer validation lists include `references/worktrees.md`, `references/templates/worktree-manifest.md`, `skills/worktree-lifecycle/SKILL.md`, and `agents/local-orchestrator.md`.
 - Confirm new Claude-specific guidance uses `CLAUDE.md`, the resolved Claude Code home, Markdown subagent definitions, Claude model aliases, effort levels, permission modes, Claude tool names, and Claude session commands where applicable.
 - Compare generic policy changes with the companion Codex playbook and either align them or record the concrete harness-specific reason for divergence.
