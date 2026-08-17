@@ -18,7 +18,8 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Resolve-Path (Join-Path $ScriptDir "..")
 $ClaudeHome = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME ".claude" }
 $Timestamp = Get-Date -Format "yyyyMMddHHmmss"
-$ManifestPath = Join-Path $ClaudeHome ".claude-code-agent-playbook-managed-files.tsv"
+$ManifestPath = Join-Path $ClaudeHome ".coding-agent-playbook-claude-code-managed-files.tsv"
+$LegacyManifestPath = Join-Path $ClaudeHome ".claude-code-agent-playbook-managed-files.tsv"
 
 function Write-Step($Message) {
   Write-Host $Message
@@ -234,7 +235,7 @@ function Retire-StaleManagedFiles {
 function Write-InstallManifest {
   param([array]$Entries, [string]$Path)
 
-  $Lines = @('# claude-code-agent-playbook managed files v1')
+  $Lines = @('# coding-agent-playbook-claude-code managed files v1')
   foreach ($Entry in $Entries) {
     $Lines += "$($Entry.Root)`t$($Entry.Path)`t$($Entry.Hash)"
   }
@@ -259,11 +260,25 @@ function Write-InstallManifest {
   }
 }
 
+function Retire-LegacyManifest {
+  param([string]$LegacyPath)
+
+  if (-not (Test-Path -LiteralPath $LegacyPath -PathType Leaf)) {
+    return
+  }
+
+  Backup-File $LegacyPath
+  Write-Step "Retiring legacy managed-file manifest: $LegacyPath"
+  Invoke-InstallCommand { Remove-Item -LiteralPath $LegacyPath -Force } "Remove-Item '$LegacyPath'"
+}
+
 function AddOrReplace-PlaybookSection {
   param([string]$Target, [string]$Title, [string]$Body)
 
-  $StartMarker = "<!-- claude-code-agent-playbook:start -->"
-  $EndMarker = "<!-- claude-code-agent-playbook:end -->"
+  $StartMarker = "<!-- coding-agent-playbook-claude-code:start -->"
+  $EndMarker = "<!-- coding-agent-playbook-claude-code:end -->"
+  $LegacyStartMarker = "<!-- claude-code-agent-playbook:start -->"
+  $LegacyEndMarker = "<!-- claude-code-agent-playbook:end -->"
   $Parent = Split-Path -Parent $Target
   $Existing = ""
   $Newline = "`n"
@@ -272,24 +287,44 @@ function AddOrReplace-PlaybookSection {
   if (Test-Path -LiteralPath $Target -PathType Leaf) {
     $Existing = Get-Content -LiteralPath $Target -Raw
     $Newline = if ($Existing.Contains("`r`n")) { "`r`n" } else { "`n" }
-    $StartIndex = $Existing.IndexOf($StartMarker, [System.StringComparison]::Ordinal)
-    $EndIndex = $Existing.IndexOf($EndMarker, [System.StringComparison]::Ordinal)
-    $HasStart = $StartIndex -ge 0
-    $HasEnd = $EndIndex -ge 0
+    $CurrentStartIndex = $Existing.IndexOf($StartMarker, [System.StringComparison]::Ordinal)
+    $CurrentEndIndex = $Existing.IndexOf($EndMarker, [System.StringComparison]::Ordinal)
+    $LegacyStartIndex = $Existing.IndexOf($LegacyStartMarker, [System.StringComparison]::Ordinal)
+    $LegacyEndIndex = $Existing.IndexOf($LegacyEndMarker, [System.StringComparison]::Ordinal)
+    $HasAnyMarker = $CurrentStartIndex -ge 0 -or $CurrentEndIndex -ge 0 -or $LegacyStartIndex -ge 0 -or $LegacyEndIndex -ge 0
 
-    if ($HasStart -or $HasEnd) {
-      $SecondStartIndex = if ($HasStart) { $Existing.IndexOf($StartMarker, $StartIndex + $StartMarker.Length, [System.StringComparison]::Ordinal) } else { -1 }
-      $SecondEndIndex = if ($HasEnd) { $Existing.IndexOf($EndMarker, $EndIndex + $EndMarker.Length, [System.StringComparison]::Ordinal) } else { -1 }
+    if ($HasAnyMarker) {
+      $CurrentPairValid = $CurrentStartIndex -ge 0 -and $CurrentEndIndex -gt $CurrentStartIndex -and
+        $Existing.IndexOf($StartMarker, $CurrentStartIndex + $StartMarker.Length, [System.StringComparison]::Ordinal) -lt 0 -and
+        $Existing.IndexOf($EndMarker, $CurrentEndIndex + $EndMarker.Length, [System.StringComparison]::Ordinal) -lt 0
+      $LegacyPairValid = $LegacyStartIndex -ge 0 -and $LegacyEndIndex -gt $LegacyStartIndex -and
+        $Existing.IndexOf($LegacyStartMarker, $LegacyStartIndex + $LegacyStartMarker.Length, [System.StringComparison]::Ordinal) -lt 0 -and
+        $Existing.IndexOf($LegacyEndMarker, $LegacyEndIndex + $LegacyEndMarker.Length, [System.StringComparison]::Ordinal) -lt 0
+      $CurrentPairAbsent = $CurrentStartIndex -lt 0 -and $CurrentEndIndex -lt 0
+      $LegacyPairAbsent = $LegacyStartIndex -lt 0 -and $LegacyEndIndex -lt 0
 
-      if (-not ($HasStart -and $HasEnd) -or $SecondStartIndex -ge 0 -or $SecondEndIndex -ge 0 -or $EndIndex -lt $StartIndex) {
+      if ((-not $CurrentPairValid -and -not $CurrentPairAbsent) -or
+          (-not $LegacyPairValid -and -not $LegacyPairAbsent) -or
+          ($CurrentPairValid -and $LegacyPairValid)) {
         throw "Malformed Coding Agent Playbook — Claude Code Edition markers in $Target; no changes were made."
+      }
+
+      if ($CurrentPairValid) {
+        $ActiveStartIndex = $CurrentStartIndex
+        $ActiveEndIndex = $CurrentEndIndex
+        $ActiveEndMarker = $EndMarker
+      } else {
+        $ActiveStartIndex = $LegacyStartIndex
+        $ActiveEndIndex = $LegacyEndIndex
+        $ActiveEndMarker = $LegacyEndMarker
+        Write-Step "Migrating legacy Coding Agent Playbook markers in $Target"
       }
 
       if ($Newline -eq "`r`n") {
         $NormalizedBody = $NormalizedBody -replace "`n", "`r`n"
       }
       $Section = "$StartMarker$Newline# $Title$Newline$Newline$NormalizedBody$Newline$EndMarker"
-      $Updated = $Existing.Substring(0, $StartIndex) + $Section + $Existing.Substring($EndIndex + $EndMarker.Length)
+      $Updated = $Existing.Substring(0, $ActiveStartIndex) + $Section + $Existing.Substring($ActiveEndIndex + $ActiveEndMarker.Length)
       if ($Updated -eq $Existing) {
         Write-Step "Unchanged $Target"
         return
@@ -344,7 +379,11 @@ if (-not (Test-Path -LiteralPath $GlobalInstructions -PathType Leaf)) {
 }
 
 $CurrentManifestEntries = Get-CurrentManifestEntries $ManagedRoots
-$PreviousManifestEntries = Read-InstallManifest $ManifestPath $ManagedRoots
+$PreviousManifestPath = if (Test-Path -LiteralPath $ManifestPath -PathType Leaf) { $ManifestPath } elseif (Test-Path -LiteralPath $LegacyManifestPath -PathType Leaf) { $LegacyManifestPath } else { $ManifestPath }
+if ($PreviousManifestPath -eq $LegacyManifestPath) {
+  Write-Step "Migrating legacy managed-file manifest: $LegacyManifestPath"
+}
+$PreviousManifestEntries = Read-InstallManifest $PreviousManifestPath $ManagedRoots
 
 if ($Mode -eq "full") {
   $Body = Get-Content -LiteralPath $GlobalInstructions -Raw
@@ -404,6 +443,7 @@ Copy-PlaybookTree $SkillsDir $ManagedRoots['skills'].Destination
 Assert-ManagedFilesMatch $CurrentManifestEntries $ManagedRoots
 Retire-StaleManagedFiles $PreviousManifestEntries $CurrentManifestEntries $ManagedRoots
 Write-InstallManifest $CurrentManifestEntries $ManifestPath
+Retire-LegacyManifest $LegacyManifestPath
 
 Write-Step ""
 Write-Step "Validation:"

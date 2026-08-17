@@ -143,7 +143,7 @@ If `$GLOBAL_CLAUDE_MD` does not exist:
 
 If `$GLOBAL_CLAUDE_MD` already exists:
 - Preserve it.
-- Preserve all user-authored content outside the exact `<!-- claude-code-agent-playbook:start -->` and `<!-- claude-code-agent-playbook:end -->` markers.
+- Preserve all user-authored content outside the exact `<!-- coding-agent-playbook-claude-code:start -->` and `<!-- coding-agent-playbook-claude-code:end -->` markers. Migrate one valid legacy `claude-code-agent-playbook` marker pair instead of appending a duplicate section.
 - If exactly one well-ordered marked section exists, create a timestamped backup and replace only that inclusive block with the current small reference section.
 - If neither marker exists, add the marked small reference section.
 - If only one marker exists, either marker is duplicated, or the end appears before the start, stop and report the malformed state without writing the file.

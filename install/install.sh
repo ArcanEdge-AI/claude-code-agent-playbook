@@ -47,7 +47,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 CLAUDE_HOME="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 TIMESTAMP="$(date +%Y%m%d%H%M%S)"
-MANIFEST_PATH="$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv"
+MANIFEST_PATH="$CLAUDE_HOME/.coding-agent-playbook-claude-code-managed-files.tsv"
+LEGACY_MANIFEST_PATH="$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv"
 
 say() {
   printf '%s\n' "$*"
@@ -149,7 +150,7 @@ build_current_manifest() {
   local output="$1"
   local root src_dir src rel hash
 
-  printf '# claude-code-agent-playbook managed files v1\n' > "$output"
+  printf '# coding-agent-playbook-claude-code managed files v1\n' > "$output"
   for root in references agents skills; do
     case "$root" in
       references) src_dir="$REFERENCES_DIR" ;;
@@ -289,40 +290,99 @@ write_install_manifest() {
   run cp "$current_manifest" "$destination"
 }
 
+retire_legacy_manifest() {
+  local legacy_path="$1"
+  [[ -f "$legacy_path" ]] || return 0
+
+  backup_file "$legacy_path"
+  say "Retiring legacy managed-file manifest: $legacy_path"
+  run rm -f -- "$legacy_path"
+}
+
 add_or_replace_playbook_section() {
   local target="$1"
   local title="$2"
   local body="$3"
-  local start_marker='<!-- claude-code-agent-playbook:start -->'
-  local end_marker='<!-- claude-code-agent-playbook:end -->'
+  local start_marker='<!-- coding-agent-playbook-claude-code:start -->'
+  local end_marker='<!-- coding-agent-playbook-claude-code:end -->'
+  local legacy_start_marker='<!-- claude-code-agent-playbook:start -->'
+  local legacy_end_marker='<!-- claude-code-agent-playbook:end -->'
 
   if [[ -f "$target" ]]; then
-    local start_count end_count start_line end_line marker_line_ending newline section temp
-    read -r start_count end_count start_line end_line marker_line_ending < <(
-      awk -v start="$start_marker" -v end="$end_marker" '
+    local current_start_count current_end_count current_start_line current_end_line current_line_ending
+    local legacy_start_count legacy_end_count legacy_start_line legacy_end_line legacy_line_ending
+    local current_pair_valid=0 legacy_pair_valid=0
+    local active_start_marker active_end_marker marker_line_ending newline section temp
+    read -r current_start_count current_end_count current_start_line current_end_line current_line_ending legacy_start_count legacy_end_count legacy_start_line legacy_end_line legacy_line_ending < <(
+      awk -v start="$start_marker" -v end="$end_marker" -v legacy_start="$legacy_start_marker" -v legacy_end="$legacy_end_marker" '
+        BEGIN {
+          current_line_ending = "none"
+          legacy_line_ending = "none"
+        }
         {
           line = $0
           has_cr = sub(/\r$/, "", line)
           if (line == start) {
-            start_count++
-            if (start_line == 0) {
-              start_line = NR
-              marker_line_ending = has_cr ? "crlf" : "lf"
+            current_start_count++
+            if (current_start_line == 0) {
+              current_start_line = NR
+              current_line_ending = has_cr ? "crlf" : "lf"
             }
           }
           if (line == end) {
-            end_count++
-            if (end_line == 0) end_line = NR
+            current_end_count++
+            if (current_end_line == 0) current_end_line = NR
+          }
+          if (line == legacy_start) {
+            legacy_start_count++
+            if (legacy_start_line == 0) {
+              legacy_start_line = NR
+              legacy_line_ending = has_cr ? "crlf" : "lf"
+            }
+          }
+          if (line == legacy_end) {
+            legacy_end_count++
+            if (legacy_end_line == 0) legacy_end_line = NR
           }
         }
-        END { print start_count + 0, end_count + 0, start_line + 0, end_line + 0, marker_line_ending }
+        END {
+          print current_start_count + 0, current_end_count + 0, current_start_line + 0, current_end_line + 0, current_line_ending, \
+            legacy_start_count + 0, legacy_end_count + 0, legacy_start_line + 0, legacy_end_line + 0, legacy_line_ending
+        }
       ' "$target"
     )
 
-    if [[ "$start_count" != "0" || "$end_count" != "0" ]]; then
-      if [[ "$start_count" != "1" || "$end_count" != "1" ]] || (( end_line <= start_line )); then
+    if (( current_start_count != 0 || current_end_count != 0 || legacy_start_count != 0 || legacy_end_count != 0 )); then
+      if (( current_start_count != 0 || current_end_count != 0 )); then
+        if (( current_start_count != 1 || current_end_count != 1 || current_end_line <= current_start_line )); then
+          say "Malformed Coding Agent Playbook — Claude Code Edition markers in $target; no changes were made." >&2
+          return 1
+        fi
+        current_pair_valid=1
+      fi
+
+      if (( legacy_start_count != 0 || legacy_end_count != 0 )); then
+        if (( legacy_start_count != 1 || legacy_end_count != 1 || legacy_end_line <= legacy_start_line )); then
+          say "Malformed Coding Agent Playbook — Claude Code Edition markers in $target; no changes were made." >&2
+          return 1
+        fi
+        legacy_pair_valid=1
+      fi
+
+      if (( current_pair_valid == 1 && legacy_pair_valid == 1 )); then
         say "Malformed Coding Agent Playbook — Claude Code Edition markers in $target; no changes were made." >&2
         return 1
+      fi
+
+      if (( current_pair_valid == 1 )); then
+        active_start_marker="$start_marker"
+        active_end_marker="$end_marker"
+        marker_line_ending="$current_line_ending"
+      else
+        active_start_marker="$legacy_start_marker"
+        active_end_marker="$legacy_end_marker"
+        marker_line_ending="$legacy_line_ending"
+        say "Migrating legacy Coding Agent Playbook markers in $target"
       fi
 
       newline=$'\n'
@@ -332,8 +392,8 @@ add_or_replace_playbook_section() {
         body="${body//$'\n'/$'\r\n'}"
       fi
       section="$start_marker$newline# $title$newline$newline$body$newline$end_marker$newline"
-      temp="$(mktemp "${target}.claude-code-agent-playbook.XXXXXX")"
-      awk -v start="$start_marker" -v end="$end_marker" -v section="$section" -v newline="$newline" '
+      temp="$(mktemp "${target}.coding-agent-playbook-claude-code.XXXXXX")"
+      awk -v start="$active_start_marker" -v end="$active_end_marker" -v section="$section" -v newline="$newline" '
         {
           line = $0
           sub(/\r$/, "", line)
@@ -411,10 +471,15 @@ if [[ ! -f "$GLOBAL_INSTRUCTIONS" ]]; then
   exit 1
 fi
 
-CURRENT_MANIFEST="$(mktemp "${TMPDIR:-/tmp}/claude-code-agent-playbook-manifest.XXXXXX")"
+CURRENT_MANIFEST="$(mktemp "${TMPDIR:-/tmp}/coding-agent-playbook-claude-code-manifest.XXXXXX")"
 trap 'rm -f "$CURRENT_MANIFEST"' EXIT
 build_current_manifest "$CURRENT_MANIFEST"
-validate_install_manifest "$MANIFEST_PATH"
+PREVIOUS_MANIFEST_PATH="$MANIFEST_PATH"
+if [[ ! -f "$MANIFEST_PATH" && -f "$LEGACY_MANIFEST_PATH" ]]; then
+  PREVIOUS_MANIFEST_PATH="$LEGACY_MANIFEST_PATH"
+  say "Migrating legacy managed-file manifest: $LEGACY_MANIFEST_PATH"
+fi
+validate_install_manifest "$PREVIOUS_MANIFEST_PATH"
 
 if [[ "$MODE" == "full" ]]; then
   BODY="$(cat "$GLOBAL_INSTRUCTIONS")"
@@ -470,8 +535,9 @@ copy_tree "$REFERENCES_DIR" "$CLAUDE_HOME/references"
 copy_tree "$AGENTS_DIR" "$CLAUDE_HOME/agents"
 copy_tree "$SKILLS_DIR" "$CLAUDE_HOME/skills"
 verify_managed_files "$CURRENT_MANIFEST"
-retire_stale_managed_files "$MANIFEST_PATH" "$CURRENT_MANIFEST"
+retire_stale_managed_files "$PREVIOUS_MANIFEST_PATH" "$CURRENT_MANIFEST"
 write_install_manifest "$CURRENT_MANIFEST" "$MANIFEST_PATH"
+retire_legacy_manifest "$LEGACY_MANIFEST_PATH"
 
 say ""
 say "Validation:"

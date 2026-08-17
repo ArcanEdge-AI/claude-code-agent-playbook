@@ -6,7 +6,7 @@ The intended experience is:
 
 ```text
 Install this repo into my Claude Code setup:
-https://github.com/ArcanEdge-AI/claude-code-agent-playbook
+https://github.com/ArcanEdge-AI/coding-agent-playbook-claude-code
 
 Follow INSTALL.md. Use full install unless I explicitly ask for support-only mode.
 Preserve my existing files with backups and report exactly what changed.
@@ -19,7 +19,7 @@ A full install creates or updates this user-level structure:
 ```text
 $CLAUDE_HOME/
   CLAUDE.md
-  .claude-code-agent-playbook-managed-files.tsv
+  .coding-agent-playbook-claude-code-managed-files.tsv
   references/
     README.md
     model-routing.md
@@ -68,7 +68,7 @@ Full install:
 
 The global instruction body is always installed inside one clearly marked Coding Agent Playbook — Claude Code Edition section. Preserve content outside the markers. Add the marked section when both markers are absent or replace exactly one well-ordered marked section after a timestamped backup. If only one marker exists, either marker is duplicated, or the end appears before the start, stop without writing the file.
 
-After a successful run, the installer writes `$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv` with every managed support-file path and source SHA-256. On later runs, files removed from the repository are backed up and retired only when they still match the previously installed hash. Customized formerly managed files are preserved and reported. Files that were never recorded as playbook-managed are never removed.
+After a successful run, the installer writes `$CLAUDE_HOME/.coding-agent-playbook-claude-code-managed-files.tsv` with every managed support-file path and source SHA-256. On later runs, files removed from the repository are backed up and retired only when they still match the previously installed hash. Customized formerly managed files are preserved and reported. Files that were never recorded as playbook-managed are never removed. An existing `.claude-code-agent-playbook-managed-files.tsv` is migrated automatically after a successful update.
 
 The first manifest-aware update has no previous ownership record, so it safely preserves existing unlisted files. Subsequent updates can distinguish unchanged retired files from user customizations.
 
@@ -92,8 +92,8 @@ Clone the repository and run the installer for your shell.
 ### macOS / Linux / WSL
 
 ```bash
-git clone https://github.com/ArcanEdge-AI/claude-code-agent-playbook.git
-cd claude-code-agent-playbook
+git clone https://github.com/ArcanEdge-AI/coding-agent-playbook-claude-code.git
+cd coding-agent-playbook-claude-code
 bash install/install.sh --full
 ```
 
@@ -112,8 +112,8 @@ bash install/install.sh --full --dry-run
 ### Windows PowerShell
 
 ```powershell
-git clone https://github.com/ArcanEdge-AI/claude-code-agent-playbook.git
-cd claude-code-agent-playbook
+git clone https://github.com/ArcanEdge-AI/coding-agent-playbook-claude-code.git
+cd coding-agent-playbook-claude-code
 pwsh -ExecutionPolicy Bypass -File install/install.ps1 -Full
 ```
 
@@ -150,7 +150,7 @@ Do not modify arbitrary repositories during installation. Only use a temporary c
 After installation, verify:
 
 - `$CLAUDE_HOME/CLAUDE.md` exists or was intentionally left as a pointer-only file.
-- `$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv` exists and lists every current managed support file once.
+- `$CLAUDE_HOME/.coding-agent-playbook-claude-code-managed-files.tsv` exists and lists every current managed support file once.
 - `$CLAUDE_HOME/references/model-routing.md` exists.
 - `$CLAUDE_HOME/references/subagents.md` exists.
 - `$CLAUDE_HOME/references/worktrees.md` exists.
@@ -192,7 +192,7 @@ To remove it manually, delete:
 
 ```text
 $CLAUDE_HOME/references/
-$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv
+$CLAUDE_HOME/.coding-agent-playbook-claude-code-managed-files.tsv
 $CLAUDE_HOME/agents/local-orchestrator.md
 $CLAUDE_HOME/agents/read-only-explorer.md
 $CLAUDE_HOME/agents/senior-reviewer.md

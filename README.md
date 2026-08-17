@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/claude-code-agent-playbook-hero.png" alt="Coding Agent Playbook — Claude Code Edition hero banner" width="100%" />
+  <img src="./assets/coding-agent-playbook-claude-code-hero.png" alt="Coding Agent Playbook — Claude Code Edition hero banner" width="100%" />
 </p>
 
 <h1 align="center">Coding Agent Playbook — Claude Code Edition</h1>
@@ -30,14 +30,14 @@
   <img src="https://img.shields.io/badge/Subagents-Orchestrated-00C2FF" alt="Subagents Orchestrated" />
   <img src="https://img.shields.io/badge/Sessions-Coordinated-4ECDC4" alt="Sessions Coordinated" />
   <img src="https://img.shields.io/badge/Instructions-Tool--Agnostic-8A5CFF" alt="Instructions Tool Agnostic" />
-  <a href="https://github.com/ArcanEdge-AI/codex-agent-playbook"><img src="https://img.shields.io/badge/Codex-Edition-D97706" alt="Codex Edition" /></a>
+  <a href="https://github.com/ArcanEdge-AI/coding-agent-playbook-codex"><img src="https://img.shields.io/badge/Codex-Edition-D97706" alt="Codex Edition" /></a>
   <img src="https://img.shields.io/badge/License-MIT-2ECC71" alt="MIT License" />
   <img src="https://img.shields.io/badge/Status-Active-2ECC71" alt="Status Active" />
 </p>
 
 <p align="center">
   <strong>Using Codex instead?</strong>
-  <a href="https://github.com/ArcanEdge-AI/codex-agent-playbook">Open the Codex edition</a>.
+  <a href="https://github.com/ArcanEdge-AI/coding-agent-playbook-codex">Open the Codex edition</a>.
 </p>
 
 ---
@@ -47,7 +47,7 @@
 The easiest install path is to give this repository URL to your coding agent:
 
 ```text
-Install this globally: https://github.com/ArcanEdge-AI/claude-code-agent-playbook
+Install this globally: https://github.com/ArcanEdge-AI/coding-agent-playbook-claude-code
 
 Follow the repository's INSTALL.md exactly. Use full mode even when an older installation exists; do not infer support-only mode unless I explicitly request it. Preserve my existing instructions, back up anything you change, install the global instructions, references, skills, and custom subagents, then report the installed files and validation results.
 ```
@@ -57,7 +57,7 @@ That is the intended public experience: users should not need to understand the 
 Support-only is an explicit pointer-only configuration, not an update mode. Use it only when the user confirms the global instructions already live in their global `CLAUDE.md` manually:
 
 ```text
-Install this in support-only mode: https://github.com/ArcanEdge-AI/claude-code-agent-playbook
+Install this in support-only mode: https://github.com/ArcanEdge-AI/coding-agent-playbook-claude-code
 
 I already added the global custom instructions manually. Follow INSTALL.md, but do not duplicate the full instructions into CLAUDE.md. Install references, skills, and custom subagents only.
 ```
@@ -73,8 +73,8 @@ Ask your coding agent to install the repository URL and follow `INSTALL.md`. Nor
 ### Manual install: macOS / Linux / WSL
 
 ```bash
-git clone https://github.com/ArcanEdge-AI/claude-code-agent-playbook.git
-cd claude-code-agent-playbook
+git clone https://github.com/ArcanEdge-AI/coding-agent-playbook-claude-code.git
+cd coding-agent-playbook-claude-code
 bash install/install.sh --full
 ```
 
@@ -93,8 +93,8 @@ bash install/install.sh --full --dry-run
 ### Manual install: Windows PowerShell
 
 ```powershell
-git clone https://github.com/ArcanEdge-AI/claude-code-agent-playbook.git
-cd claude-code-agent-playbook
+git clone https://github.com/ArcanEdge-AI/coding-agent-playbook-claude-code.git
+cd coding-agent-playbook-claude-code
 pwsh -ExecutionPolicy Bypass -File install/install.ps1 -Full
 ```
 
@@ -128,8 +128,8 @@ Coding Agent Playbook ships as separate harness-native editions. This repository
 
 | Edition | Repository | Use when |
 | --- | --- | --- |
-| Claude Code | `ArcanEdge-AI/claude-code-agent-playbook` | You want global Claude Code instructions, reference docs, skills, and subagent definitions. |
-| Codex | [`ArcanEdge-AI/codex-agent-playbook`](https://github.com/ArcanEdge-AI/codex-agent-playbook) | You want the harness-native edition tuned for Codex. |
+| Claude Code | `ArcanEdge-AI/coding-agent-playbook-claude-code` | You want global Claude Code instructions, reference docs, skills, and subagent definitions. |
+| Codex | [`ArcanEdge-AI/coding-agent-playbook-codex`](https://github.com/ArcanEdge-AI/coding-agent-playbook-codex) | You want the harness-native edition tuned for Codex. |
 
 The philosophy is shared across both: the root agent acts as the senior engineer and orchestrator, subagents perform bounded evidence-backed execution, independent project sessions are coordinated explicitly, and final decisions stay with the root agent.
 
@@ -411,7 +411,7 @@ references/worktrees.md
 ├── LICENSE
 ├── README.md
 ├── assets/
-│   └── claude-code-agent-playbook-hero.png
+│   └── coding-agent-playbook-claude-code-hero.png
 ├── agents/
 │   ├── docs-researcher.md
 │   ├── isolated-worker.md
