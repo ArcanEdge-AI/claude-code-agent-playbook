@@ -282,7 +282,7 @@ function AddOrReplace-PlaybookSection {
       $SecondEndIndex = if ($HasEnd) { $Existing.IndexOf($EndMarker, $EndIndex + $EndMarker.Length, [System.StringComparison]::Ordinal) } else { -1 }
 
       if (-not ($HasStart -and $HasEnd) -or $SecondStartIndex -ge 0 -or $SecondEndIndex -ge 0 -or $EndIndex -lt $StartIndex) {
-        throw "Malformed Claude Code Agent Playbook markers in $Target; no changes were made."
+        throw "Malformed Coding Agent Playbook — Claude Code Edition markers in $Target; no changes were made."
       }
 
       if ($Newline -eq "`r`n") {
@@ -297,7 +297,7 @@ function AddOrReplace-PlaybookSection {
 
       Backup-File $Target
       if ($DryRun) {
-        Write-Step "[dry-run] Would replace the Claude Code Agent Playbook section in $Target"
+        Write-Step "[dry-run] Would replace the Coding Agent Playbook — Claude Code Edition section in $Target"
       } else {
         Set-Content -LiteralPath $Target -Value $Updated -Encoding UTF8 -NoNewline
       }
@@ -333,7 +333,7 @@ $ManagedRoots = [ordered]@{
   skills = @{ Source = $SkillsDir; Destination = (Join-Path $ClaudeHome "skills") }
 }
 
-Write-Step "Claude Code Agent Playbook installer"
+Write-Step "Coding Agent Playbook — Claude Code Edition installer"
 Write-Step "Mode: $Mode"
 Write-Step "Repository: $RepoRoot"
 Write-Step "CLAUDE_HOME: $ClaudeHome"
@@ -348,7 +348,7 @@ $PreviousManifestEntries = Read-InstallManifest $ManifestPath $ManagedRoots
 
 if ($Mode -eq "full") {
   $Body = Get-Content -LiteralPath $GlobalInstructions -Raw
-  AddOrReplace-PlaybookSection $TargetClaudeMd "Claude Code Agent Playbook Global Instructions" $Body
+  AddOrReplace-PlaybookSection $TargetClaudeMd "Coding Agent Playbook — Claude Code Edition Global Instructions" $Body
 } else {
   $PointerBody = @'
 The primary global coding-agent behavior may already be configured in this CLAUDE.md file.

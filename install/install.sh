@@ -321,7 +321,7 @@ add_or_replace_playbook_section() {
 
     if [[ "$start_count" != "0" || "$end_count" != "0" ]]; then
       if [[ "$start_count" != "1" || "$end_count" != "1" ]] || (( end_line <= start_line )); then
-        say "Malformed Claude Code Agent Playbook markers in $target; no changes were made." >&2
+        say "Malformed Coding Agent Playbook — Claude Code Edition markers in $target; no changes were made." >&2
         return 1
       fi
 
@@ -352,7 +352,7 @@ add_or_replace_playbook_section() {
       backup_file "$target"
       if [[ "$DRY_RUN" == "1" ]]; then
         rm -f "$temp"
-        say "[dry-run] Would replace the Claude Code Agent Playbook section in $target"
+        say "[dry-run] Would replace the Coding Agent Playbook — Claude Code Edition section in $target"
         return
       fi
 
@@ -400,7 +400,7 @@ AGENTS_DIR="$REPO_ROOT/agents"
 SKILLS_DIR="$REPO_ROOT/skills"
 TARGET_CLAUDE_MD="$CLAUDE_HOME/CLAUDE.md"
 
-say "Claude Code Agent Playbook installer"
+say "Coding Agent Playbook — Claude Code Edition installer"
 say "Mode: $MODE"
 say "Repository: $REPO_ROOT"
 say "CLAUDE_HOME: $CLAUDE_HOME"
@@ -418,7 +418,7 @@ validate_install_manifest "$MANIFEST_PATH"
 
 if [[ "$MODE" == "full" ]]; then
   BODY="$(cat "$GLOBAL_INSTRUCTIONS")"
-  add_or_replace_playbook_section "$TARGET_CLAUDE_MD" "Claude Code Agent Playbook Global Instructions" "$BODY"
+  add_or_replace_playbook_section "$TARGET_CLAUDE_MD" "Coding Agent Playbook — Claude Code Edition Global Instructions" "$BODY"
 else
   POINTER_BODY='The primary global coding-agent behavior may already be configured in this CLAUDE.md file.
 

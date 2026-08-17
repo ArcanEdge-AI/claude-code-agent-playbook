@@ -1,4 +1,4 @@
-# Install Claude Code Agent Playbook
+# Install Coding Agent Playbook — Claude Code Edition
 
 This file is written for both humans and AI coding agents.
 
@@ -66,7 +66,7 @@ Full install:
 - copies custom Claude Code subagent definitions into `$CLAUDE_HOME/agents/`
 - copies skills into `$CLAUDE_HOME/skills/`
 
-The global instruction body is always installed inside one clearly marked Claude Code Agent Playbook section. Preserve content outside the markers. Add the marked section when both markers are absent or replace exactly one well-ordered marked section after a timestamped backup. If only one marker exists, either marker is duplicated, or the end appears before the start, stop without writing the file.
+The global instruction body is always installed inside one clearly marked Coding Agent Playbook — Claude Code Edition section. Preserve content outside the markers. Add the marked section when both markers are absent or replace exactly one well-ordered marked section after a timestamped backup. If only one marker exists, either marker is duplicated, or the end appears before the start, stop without writing the file.
 
 After a successful run, the installer writes `$CLAUDE_HOME/.claude-code-agent-playbook-managed-files.tsv` with every managed support-file path and source SHA-256. On later runs, files removed from the repository are backed up and retired only when they still match the previously installed hash. Customized formerly managed files are preserved and reported. Files that were never recorded as playbook-managed are never removed.
 
@@ -207,4 +207,4 @@ $CLAUDE_HOME/skills/reference-doc-routing/
 $CLAUDE_HOME/skills/senior-code-review/
 ```
 
-If you used full install and want to remove the global instructions, edit `$CLAUDE_HOME/CLAUDE.md` and remove the section between the Claude Code Agent Playbook start/end markers.
+If you used full install and want to remove the global instructions, edit `$CLAUDE_HOME/CLAUDE.md` and remove the section between the Coding Agent Playbook — Claude Code Edition start/end markers.

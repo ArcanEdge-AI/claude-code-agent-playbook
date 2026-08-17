@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Claude Code Agent Playbook.
+Thanks for helping improve Coding Agent Playbook — Claude Code Edition.
 
 This repository is intentionally public and reusable. Contributions should make the playbook clearer, more durable, and less tool-specific.
 
