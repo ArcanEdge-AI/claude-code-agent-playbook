@@ -23,19 +23,25 @@ $CLAUDE_HOME/
     README.md
     model-routing.md
     subagents.md
+    worktrees.md
     multi-session-coordination.md
     reference-doc-routing.md
     templates/
       active-work-record.md
+      task-graph.md
+      worktree-manifest.md
       *.md
   agents/
+    local-orchestrator.md
     read-only-explorer.md
     senior-reviewer.md
     docs-researcher.md
     test-triager.md
     isolated-worker.md
   skills/
+    task-graph-orchestration/SKILL.md
     subagent-orchestration/SKILL.md
+    worktree-lifecycle/SKILL.md
     multi-session-coordination/SKILL.md
     reference-doc-routing/SKILL.md
     senior-code-review/SKILL.md
@@ -59,7 +65,7 @@ Full install:
 - copies custom Claude Code subagent definitions into `$CLAUDE_HOME/agents/`
 - copies skills into `$CLAUDE_HOME/skills/`
 
-If `$CLAUDE_HOME/CLAUDE.md` already exists, preserve it and append a clearly marked Claude Code Agent Playbook section unless the section is already present.
+If `$CLAUDE_HOME/CLAUDE.md` already exists, preserve content outside the Claude Code Agent Playbook markers. Add the marked section when both markers are absent or replace exactly one well-ordered marked section after a timestamped backup. If only one marker exists, either marker is duplicated, or the end appears before the start, stop without writing the file.
 
 ### Support-only install
 
@@ -70,6 +76,8 @@ Support-only install:
 - does not duplicate the full global instructions into `$CLAUDE_HOME/CLAUDE.md`
 - adds only a short reference-map pointer if useful
 - still copies reference docs, skills, and custom Claude Code subagent definitions
+
+Support-only reruns use the same marker validation and replacement rules, so installed pointers update without duplicating user-authored content.
 
 ## Human Install
 
@@ -138,21 +146,33 @@ After installation, verify:
 - `$CLAUDE_HOME/CLAUDE.md` exists or was intentionally left as a pointer-only file.
 - `$CLAUDE_HOME/references/model-routing.md` exists.
 - `$CLAUDE_HOME/references/subagents.md` exists.
+- `$CLAUDE_HOME/references/worktrees.md` exists.
 - `$CLAUDE_HOME/references/multi-session-coordination.md` exists.
 - `$CLAUDE_HOME/references/reference-doc-routing.md` exists.
 - `$CLAUDE_HOME/references/templates/active-work-record.md` exists.
+- `$CLAUDE_HOME/references/templates/task-graph.md` exists.
+- `$CLAUDE_HOME/references/templates/worktree-manifest.md` exists.
+- `$CLAUDE_HOME/agents/local-orchestrator.md` exists.
 - `$CLAUDE_HOME/agents/read-only-explorer.md` exists.
 - `$CLAUDE_HOME/agents/senior-reviewer.md` exists.
 - `$CLAUDE_HOME/agents/docs-researcher.md` exists.
 - `$CLAUDE_HOME/agents/test-triager.md` exists.
 - `$CLAUDE_HOME/agents/isolated-worker.md` exists.
 - `$CLAUDE_HOME/skills/subagent-orchestration/SKILL.md` exists.
+- `$CLAUDE_HOME/skills/task-graph-orchestration/SKILL.md` exists.
+- `$CLAUDE_HOME/skills/worktree-lifecycle/SKILL.md` exists.
 - `$CLAUDE_HOME/skills/multi-session-coordination/SKILL.md` exists.
+- `$CLAUDE_HOME/skills/reference-doc-routing/SKILL.md` exists.
+- `$CLAUDE_HOME/skills/senior-code-review/SKILL.md` exists.
 - Each `SKILL.md` has `name` and `description` frontmatter.
 - Each `agents/*.md` file has `name`, `description`, `model`, `effort`, `permissionMode`, and `tools` frontmatter.
 - Read-only roles use `permissionMode: plan` and exclude `Edit` and `Write` from their `tools` frontmatter.
 - Write-capable bundled roles use `permissionMode: default` unless a different mode has explicit maintainer approval.
-- Agent models use supported Claude Code model aliases rather than inherited or unrelated model identifiers.
+- Only `local-orchestrator.md` lists `Agent`; direct workers and depth-2 leaves omit it.
+- No bundled agent enables `isolation: worktree` globally.
+- Every managed agent frontmatter model is the fail-closed `haiku` alias; accepted root-permitted invocations pass any approved Sonnet or exceptional Opus route explicitly within the actual parent ceiling.
+- The installed playbook has exactly one managed definition for each of the six listed roles; per-invocation model routing is used instead of model-specific role copies, while effort remains fixed in the selected definition.
+- Routing guidance treats the actual user-selected main-session model as the root ceiling, permits equal-tier children, prohibits descendant upgrades, reserves replacement routing for the root, and rejects silent model substitution.
 - No non-Claude configuration paths, subagent schemas, or command vocabulary were introduced.
 
 ## Uninstall
@@ -163,12 +183,15 @@ To remove it manually, delete:
 
 ```text
 $CLAUDE_HOME/references/
+$CLAUDE_HOME/agents/local-orchestrator.md
 $CLAUDE_HOME/agents/read-only-explorer.md
 $CLAUDE_HOME/agents/senior-reviewer.md
 $CLAUDE_HOME/agents/docs-researcher.md
 $CLAUDE_HOME/agents/test-triager.md
 $CLAUDE_HOME/agents/isolated-worker.md
 $CLAUDE_HOME/skills/subagent-orchestration/
+$CLAUDE_HOME/skills/task-graph-orchestration/
+$CLAUDE_HOME/skills/worktree-lifecycle/
 $CLAUDE_HOME/skills/multi-session-coordination/
 $CLAUDE_HOME/skills/reference-doc-routing/
 $CLAUDE_HOME/skills/senior-code-review/

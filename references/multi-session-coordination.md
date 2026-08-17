@@ -1,10 +1,10 @@
 # Claude Code Multi-Session Coordination
 
-The main Claude Code session is responsible for coordinating independent Claude Code sessions when several sessions are working on related areas of the same project.
+The root Claude Code session is responsible for coordinating independent Claude Code sessions when several sessions are working on related areas of the same project.
 
 This workflow is different from ordinary subagent delegation:
 
-- **Subagent orchestration**: one main session delegates bounded work to Claude Code subagents and verifies their output.
+- **Subagent orchestration**: one root session delegates bounded work to Claude Code subagents and verifies their output.
 - **Multi-session coordination**: multiple independent Claude Code sessions already have separate conversation history, branches, worktrees, assumptions, and implementation ownership.
 
 The coordinating session remains accountable for architecture, ownership decisions, integration sequencing, validation, and the final user-facing report.
@@ -38,6 +38,7 @@ Do not use it when:
 6. **Resolve conflicts using primary evidence, not confident summaries.**
 7. **Do not claim a session was reviewed when only its branch, pull request, or diff was inspected.**
 8. **The final goal is behavioral compatibility, not merely a clean Git merge.**
+9. **A worktree is not disposable until its exact owner and task-local lifecycle are verified.**
 
 ## Claude Code Session Naming
 
@@ -149,6 +150,7 @@ For every relevant work item, record:
 - last known activity
 - project directory and repository
 - branch or worktree
+- worktree class and task-local permit when applicable
 - current status
 - files and modules affected
 - APIs, events, routes, or shared interfaces affected
@@ -163,6 +165,8 @@ For every relevant work item, record:
 - merge or integration status
 
 The map must distinguish confirmed facts from inference.
+
+When a task proposes or owns an auxiliary worktree, consult `references/worktrees.md`. Keep its worktree permit separate from subagent and graph-node permits. A coordinating root may clean only auxiliaries its own task created or explicitly adopted; host-managed, user-managed, and other-session worktrees remain preserved unless ownership is transferred through primary evidence.
 
 ## Conflict Categories
 
@@ -299,6 +303,8 @@ Use `references/templates/active-work-record.md` as the starting point.
 In that record, `dependencies` names required upstream work artifacts or decisions, `blocked_by` lists dependencies that are not yet satisfied, `owned_paths` records write ownership, and `validation_required` defines the gates that must pass before integration-ready status. Do not introduce synonymous fields unless a concrete consumer requires them.
 
 These records are advisory coordination aids. Verify them against current session evidence, Git state, code, tests, and pull requests before relying on them.
+
+Task-created auxiliary worktrees must be integrated and removed inside the owning task when all cleanup gates pass, or preserved with exact path, owner, branch or HEAD, blocker, and next action. Do not assign this responsibility to a scheduled cleaner. A broader stale-worktree sweep is a separate workflow and never supplies missing ownership evidence.
 
 Do not require every repository to adopt this directory.
 

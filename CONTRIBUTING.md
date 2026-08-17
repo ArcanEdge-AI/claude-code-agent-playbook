@@ -33,7 +33,7 @@ Avoid adding:
 - Keep guidance tool-agnostic unless the file is explicitly tool-specific.
 - Prefer behavior and decision rules over rigid command sequences.
 - Use examples that are generic and safe for public reuse.
-- Keep the main-agent accountability model intact.
+- Keep the root-session orchestration, actual-root-model ceiling, bounded hierarchy, permit, capability-ceiling, and task-local worktree lifecycle model intact.
 
 ## Pull Request Checklist
 
@@ -42,7 +42,10 @@ Before opening a PR:
 - Review Markdown formatting and fenced code blocks.
 - Confirm links and paths match the repository tree.
 - Confirm `SKILL.md` files include `name` and `description` frontmatter.
-- Confirm `agents/*.md` files include valid YAML frontmatter (`name`, `description`, `tools`) if changed, and that read-only roles exclude `Edit`/`Write`.
+- Confirm `agents/*.md` files include valid YAML frontmatter (`name`, `description`, `model`, `effort`, `permissionMode`, and `tools`) if changed.
+- Confirm read-only roles use `permissionMode: plan` and exclude `Edit` and `Write`; only `local-orchestrator.md` lists `Agent`; no bundled agent sets `isolation: worktree` globally.
+- Confirm every managed agent defaults to Haiku, the actual root model is the ceiling, accepted routes are explicit and root-permitted, child rank never exceeds parent rank, effort is definition-level, equal-tier routes remain valid, only the root may route replacements, and no model substitution is accepted silently.
+- Confirm Unix shell scripts remain LF-only.
 - Confirm no sensitive or private material was added.
 
 ## License Note

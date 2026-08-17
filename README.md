@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Configure Claude Code to behave less like a loose autocomplete engine and more like a disciplined senior engineer: plan clearly, change surgically, delegate carefully, coordinate parallel sessions, verify honestly, and ship maintainable code.
+  Configure Claude Code to behave less like a loose autocomplete engine and more like a disciplined senior engineer: orchestrate bounded subagent execution, plan clearly, coordinate parallel work, verify honestly, and ship maintainable code.
 </p>
 
 <p align="center">
@@ -18,6 +18,8 @@
   <a href="#why-this-exists">Why This Exists</a> ·
   <a href="#whats-inside">What's Inside</a> ·
   <a href="#subagent-model">Subagent Model</a> ·
+  <a href="#formal-task-graph-orchestration">Task Graphs</a> ·
+  <a href="#task-local-worktree-lifecycle">Worktrees</a> ·
   <a href="#coordinating-parallel-claude-code-sessions">Parallel Sessions</a> ·
   <a href="#repository-structure">Structure</a>
 </p>
@@ -143,9 +145,9 @@ The intent is not to make the agent slower for its own sake. The intent is to ma
 | Install scripts | `install/` | Manual installers for Unix-like shells and PowerShell. |
 | Global instructions | `custom-instructions/` | Tool-agnostic behavior rules for elegant, maintainable code. Paste into your global `CLAUDE.md`. |
 | Prompts | `claude-prompts/` | Setup and active-project coordination prompts. |
-| Reference docs | `references/` | Model, effort, permission, and isolation routing; subagent delegation; multi-session coordination; and reusable project-doc templates. |
-| Skills | `skills/` | Reusable workflows for orchestration, session coordination, document routing, and senior review. |
-| Custom agents | `agents/` | Claude Code subagent definitions for exploration, review, docs research, test triage, and isolated implementation. |
+| Reference docs | `references/` | Claude model and capability routing; finite subagent delegation; task-local worktrees; multi-session coordination; and reusable templates. |
+| Skills | `skills/` | Reusable workflows for task-graph, subagent, and worktree orchestration, session coordination, document routing, and senior review. |
+| Custom agents | `agents/` | Claude Code definitions for a bounded local orchestrator, direct workers, and non-spawning execution leaves. |
 | Repository guidance | `CLAUDE.md` | Instructions for maintaining this public playbook repository. |
 
 ---
@@ -168,43 +170,56 @@ Support-only mode avoids duplicating the full instruction file and installs only
 
 ## Core Philosophy
 
-The main Claude Code session is the senior engineer and orchestrator.
+The root Claude Code session is the senior engineer and orchestrator.
 
 It owns:
 
 - task understanding
 - the working plan
 - architecture and design judgment
-- delegation decisions
+- root topology, routing, permits, and budgets
 - parallel-session coordination
-- final implementation
+- integration and final acceptance
 - final diff
 - validation strategy
 - final response
 
-Subagents can help, but they do not own the outcome. Their job is to return bounded findings with evidence. Independent Claude Code sessions may own separate workstreams, but the coordinating session still owns compatibility and integration decisions.
+For repository tasks, subagents perform bounded execution when they are available; the root still owns the outcome. Independent Claude Code sessions may own separate workstreams, but the coordinating root owns compatibility and integration decisions.
 
-> Use subagents and parallel sessions when they create leverage. Do not use them merely because they are available.
+> Delegate at least one bounded execution assignment when subagents are available. Root direct execution is limited to unavailable subagents, an explicit user prohibition, or a specific authority-bound action that cannot be delegated; record the exact exception.
 
-For work with multiple delegable parts, the main session maps bounded work nodes, real blocking dependencies, write ownership or read scope, and verification gates before fan-out. Independent nodes may run concurrently only when their permission and tool boundaries are sufficient, isolation exists, and coordination cost is justified. Small tasks remain simple and sequential.
+For multi-node work, the root records the actual user-selected root model, a finite manifest, total subagent budget, child-specific permits, real dependencies, ownership, model and capability ceilings, exact workspaces, and verification gates. Dispatch only ready permitted nodes with remaining budget and runtime capacity. Small tasks may skip formal graph mode and use one direct worker.
+
+Subagents share the current workspace by default. The auxiliary-worktree budget is separate and starts at zero. Only the root may authorize worktree isolation, and every task-created auxiliary is integrated and safely removed inside the task or preserved with an exact blocker.
 
 ---
 
 ## Subagent Model
 
-This playbook treats Claude Code subagents as focused engineering assistants, not autonomous owners. Each one is defined as a Markdown file with YAML frontmatter under `agents/` and explicitly sets its Claude model, effort level, permission mode, and minimum tool permissions.
+This playbook treats Claude Code subagents as focused engineering assistants, not autonomous owners. Source definitions live under `agents/` and install to the resolved user-level Claude Code agents directory. Repositories can place project-specific overrides under `.claude/agents/`. Every definition uses Markdown with YAML frontmatter and pins a fail-closed Haiku model, fixed effort level, `permissionMode`, and `tools` allowlist.
 
-| Subagent | Model | Effort | Permission | Tools | Best for |
-| --- | --- | --- | --- | --- | --- |
-| `read-only-explorer` | Haiku | Low | Plan | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and insertion points. |
-| `senior-reviewer` | Sonnet | High | Plan | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
-| `docs-researcher` | Haiku | Low | Plan | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
-| `test-triager` | Sonnet | Medium | Default | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
-| `isolated-worker` | Sonnet | Medium | Default | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
+| Subagent | Fail-closed default | Normal explicit model | Fixed effort | Permission | Tools | Best for |
+| --- | --- | --- | --- | --- | --- | --- |
+| `local-orchestrator` | Haiku | Sonnet | High | Default | Agent, Read, Grep, Glob, Bash, Edit, Write, WebFetch, WebSearch | Managing one depth-1 subset through root-permitted depth-2 leaves. |
+| `read-only-explorer` | Haiku | Haiku | Low | Plan | Read, Grep, Glob | Mapping code paths, call sites, ownership boundaries, and insertion points. |
+| `senior-reviewer` | Haiku | Sonnet | High | Plan | Read, Grep, Glob, Bash | Reviewing diffs for correctness, regressions, scope creep, maintainability, safety, performance, and accessibility. |
+| `docs-researcher` | Haiku | Haiku | Low | Plan | Read, Grep, Glob, WebFetch, WebSearch | Checking framework, library, API, or platform behavior against authoritative docs. |
+| `test-triager` | Haiku | Sonnet | Medium | Default | Read, Grep, Glob, Bash, Edit | Analyzing failing tests, logs, flakes, snapshots, and likely root causes. |
+| `isolated-worker` | Haiku | Sonnet | Medium | Default | Read, Grep, Glob, Edit, Write, Bash | Implementing small isolated changes after scope and design are clear. |
 
-Model, effort, permission, and tool routing is mandatory. The configured profiles prevent routine work from unintentionally inheriting broader main-session settings. Opus, higher effort, broader permissions, or worktree isolation must be justified and independently verified.
+Model, effort, permission, and tool routing is mandatory. Opus is rank 3, Sonnet rank 2, and Haiku rank 1. The model selected for the main Claude Code session is the root ceiling; never assume Opus. Every child must satisfy `child rank <= parent rank`, and must not broaden effort, permissions, tools, scope, workspace, or authority. Equal-tier routing is valid; depth does not force a tier drop.
 
-Worktree isolation is not enabled globally because an isolated subagent may start from the repository's default branch instead of the parent session's current `HEAD`. Use it only when the assignment's required base state is explicit.
+Claude Code supports an explicit per-invocation `model` override, so the playbook keeps one agent definition per role instead of maintaining Haiku, Sonnet, and Opus copies. Every frontmatter model fails closed at Haiku. Accepted calls are explicit root-permitted routes that record and pass the child model; automatic delegation and omitted-model routes are rejected. Effort is fixed by the selected definition rather than passed as an invocation option, and its effective value must fit the parent ceiling.
+
+- An Opus root normally routes substantial delegated work to Sonnet and cheap, objective work to Haiku. An Opus child is exceptional and needs a recorded reason and verification plan.
+- A Sonnet root may route Sonnet or Haiku children.
+- A Haiku root may route Haiku children only.
+
+Descendants preserve completed work and report when their ceiling is insufficient; they cannot request or perform an upgrade. Only the root can issue a new depth-1 replacement permit. That replacement may be stronger than the failed child, but never stronger than the actual root. Unknown or substituted effective models are routing failures: use the exact known parent family only when Claude Code can explicitly enforce and verify it, otherwise keep the work with the parent or report the limitation.
+
+Only `local-orchestrator` receives `Agent`. The other bundled agents are direct workers or depth-2 leaves and cannot spawn. Depth 3 is prohibited. A local orchestrator may spawn only when nesting support and an active `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=2` setting are both verified. Otherwise depth 1 executes directly without `Agent`; the playbook does not change that setting without authorization.
+
+Worktree isolation is not enabled globally because an isolated subagent may start from the repository default branch instead of the parent session's current `HEAD`. Only the root may authorize `isolation: worktree` under a separate permit after recording and verifying the required base state.
 
 See:
 
@@ -217,18 +232,69 @@ skills/subagent-orchestration/SKILL.md
 The delegation rule is simple:
 
 ```text
-Precise assignment → Evidence-backed output → Main-session verification → Accept or reject
+Root permit → Bounded execution → Evidence-backed output → Root verification → Accept or reject
 ```
 
-A good subagent prompt includes role, selected profile or model, effort, permission mode, tool boundary, goal, context, scope, non-goals, required evidence, escalation conditions, output format, and stop conditions.
+A good assignment includes the named agent, actual root model and rank, explicit per-invocation child model, selected definition's fixed effort, lineage, root permit, strict completion subset, model and effort ceilings, permission and tool boundary, exact workspace, goal, context, ownership, acceptance condition, evidence, stop conditions, and compact return bundle.
 
 For multi-node work, it also identifies the node, its inputs and accepted output, blocking dependencies, ownership or read scope, and verification gate. The orchestration skill explains safe fan-out, base-state and isolation checks, handoff validation, selective retries, and final combined validation.
 
 ---
 
+## Formal Task-Graph Orchestration
+
+For work with substantial fan-out, genuine dependencies, broad scope, layered consolidation, or separate implementation and verification paths, the playbook can compile an instruction-only task graph before delegation.
+
+The root Claude Code session owns the graph. It defines a finite manifest and total subagent budget, root permits, lineage, bounded nodes, accepted inputs and outputs, real dependency edges, ownership, Claude model and effort ceilings, permission and tool boundaries, exact workspaces, verification gates, and approval gates. Only ready permitted nodes run. Failed work invalidates only downstream nodes that consumed its output.
+
+This is a prompt-level coordination contract. It does not add a graph database, scheduler, runner, schema package, or orchestration framework. Keep medium graphs in the working plan. For long-running work, use `.claude/coordination/task-graphs/<task-slug>.md` when repository policy permits a local artifact.
+
+See:
+
+```text
+skills/task-graph-orchestration/SKILL.md
+references/templates/task-graph.md
+```
+
+Run the multi-session coordination workflow first when other Claude Code sessions, branches, worktrees, pull requests, or active-work records may affect the graph's ownership or contracts.
+
+---
+
+## Task-Local Worktree Lifecycle
+
+The worktree policy prevents subagent fan-out from becoming checkout fan-out:
+
+```text
+Current shared workspace + auxiliary budget 0
+    ↓
+Concrete isolation need verified
+    ↓
+Root issues one separate worktree permit
+    ↓
+Assigned work reuses that exact checkout
+    ↓
+Root integrates and validates the result
+    ↓
+Remove safely, or preserve with an exact blocker
+```
+
+Only the root may authorize `isolation: worktree`, invoke root worktree controls, create or adopt an auxiliary, change its purpose, move it, or remove it. One active auxiliary needs no added approval; two or more require user approval for the exact count and reasons. Descendants use their assigned workspace and report isolation needs upward. Retries reuse compatible worktrees.
+
+Before the final response, the root reconciles every task-created auxiliary. It either verifies safe non-force removal inside the task or reports the exact path, owner, branch or HEAD, blocker, and next action. Task-local cleanup does not depend on scheduled automation. The active host-managed worktree remains under the host's supported lifecycle.
+
+Supporting files:
+
+```text
+references/worktrees.md
+references/templates/worktree-manifest.md
+skills/worktree-lifecycle/SKILL.md
+```
+
+---
+
 ## Coordinating Parallel Claude Code Sessions
 
-Subagents are delegated from one main session. Independent Claude Code sessions may already have separate conversation history, branches, worktrees, assumptions, and implementation ownership.
+Subagents are delegated from one root session. Independent Claude Code sessions may already have separate conversation history, branches, worktrees, assumptions, and implementation ownership.
 
 Use the multi-session coordination workflow when related project work is happening in parallel:
 
@@ -279,6 +345,7 @@ Supporting files:
 ```text
 references/multi-session-coordination.md
 references/templates/active-work-record.md
+references/worktrees.md
 skills/multi-session-coordination/SKILL.md
 ```
 
@@ -290,7 +357,7 @@ The optional active-work record gives repositories a local fallback when complet
 
 Large documents are useful only when routed correctly.
 
-The main session should:
+The root session should:
 
 1. Identify which docs matter for the task.
 2. Read only relevant sections when possible.
@@ -307,6 +374,7 @@ references/model-routing.md
 references/reference-doc-routing.md
 references/subagents.md
 references/multi-session-coordination.md
+references/worktrees.md
 ```
 
 ---
@@ -315,6 +383,7 @@ references/multi-session-coordination.md
 
 ```text
 .
+├── .gitattributes
 ├── CLAUDE.md
 ├── CONTRIBUTING.md
 ├── INSTALL.md
@@ -325,6 +394,7 @@ references/multi-session-coordination.md
 ├── agents/
 │   ├── docs-researcher.md
 │   ├── isolated-worker.md
+│   ├── local-orchestrator.md
 │   ├── read-only-explorer.md
 │   ├── senior-reviewer.md
 │   └── test-triager.md
@@ -342,6 +412,7 @@ references/multi-session-coordination.md
 │   ├── multi-session-coordination.md
 │   ├── reference-doc-routing.md
 │   ├── subagents.md
+│   ├── worktrees.md
 │   └── templates/
 │       ├── active-work-record.md
 │       ├── api-contracts.md
@@ -351,6 +422,8 @@ references/multi-session-coordination.md
 │       ├── release.md
 │       ├── repository-CLAUDE.md
 │       ├── security.md
+│       ├── task-graph.md
+│       ├── worktree-manifest.md
 │       └── testing.md
 └── skills/
     ├── multi-session-coordination/
@@ -359,7 +432,11 @@ references/multi-session-coordination.md
     │   └── SKILL.md
     ├── senior-code-review/
     │   └── SKILL.md
-    └── subagent-orchestration/
+    ├── subagent-orchestration/
+    │   └── SKILL.md
+    ├── task-graph-orchestration/
+    │   └── SKILL.md
+    └── worktree-lifecycle/
         └── SKILL.md
 ```
 
@@ -379,8 +456,17 @@ Better delegation:
 Role:
 You are the read-only-explorer subagent for this task.
 
-Selected profile:
+Selected agent:
 read-only-explorer — Haiku, low effort, plan mode.
+
+Lineage and permit:
+Parent ROOT; child N1; root permit P1; bounded read-only subset within the finite task budget.
+
+Root and parent ceilings:
+The main session is Haiku rank 1. The parent ceiling is Haiku, low effort, plan mode, and Read/Grep/Glob. Invoke this child explicitly with `model: haiku`; the equal-tier route is valid and does not exceed the parent.
+
+Workspace:
+Use the current shared workspace. Do not create or request a worktree.
 
 Goal:
 Find where checkout tax is calculated and identify the smallest safe insertion point for a customer exemption flag.
@@ -393,9 +479,12 @@ Do not edit files. Do not refactor. Do not propose a new tax engine.
 
 Evidence required:
 Return file paths, function names, call chain, relevant tests, and existing exemption concepts.
+
+Acceptance condition:
+The root can verify every claimed path and symbol in the current checkout.
 ```
 
-The main session still decides the design, applies or rejects recommendations, and verifies the final diff.
+The root session still decides the design, applies or rejects recommendations, and verifies the final diff.
 
 ---
 
@@ -405,11 +494,12 @@ The main session still decides the design, applies or rejects recommendations, a
 1. Ask your coding agent to install this repository URL.
 2. Let the installer configure global instructions, references, skills, and subagents.
 3. Add repository-specific CLAUDE.md guidance to each project.
-4. For non-trivial work, let the main session plan first.
-5. For multi-node work, identify real blocking dependencies, parallel-safe nodes, ownership, and verification gates.
-6. Delegate only bounded work with explicit model, effort, permission, tool, and evidence requirements.
-7. When independent project sessions run in parallel, use the multi-session coordination skill.
-8. Verify the final combined diff and integrated behavior before accepting completion.
+4. Let the root session frame, route, and coordinate each repository task.
+5. Record the actual root model and rank, a finite manifest, total subagent budget, child permits, lineage, strict subsets, and model/capability ceilings. Use explicit root-permitted named-agent routes and per-invocation models; `local-orchestrator` may use root-permitted non-spawning depth-2 leaves only after the nesting-depth gate is verified.
+6. Dispatch only ready permitted nodes with remaining budget and runtime, safety, permission, and ownership capacity.
+7. Keep the auxiliary-worktree budget at zero unless the root verifies a real isolation need. Remove each task-created auxiliary safely before completion or preserve it with an exact blocker.
+8. When independent project sessions run in parallel, use the multi-session coordination skill.
+9. Verify the final combined diff and integrated behavior before accepting completion.
 ```
 
 ---

@@ -48,7 +48,10 @@ owner: "Optional responsible person or team"
 project_directory: "."
 branch: "feature/example"
 base_branch: "Detected repository default branch"
-worktree: "Optional repository-relative worktree identifier"
+worktree_class: "host-managed-primary | user-managed-existing | task-created-auxiliary"
+worktree_path: "Optional canonical path; omit from committed public records when private"
+worktree_permit: "Optional root-issued permit for a task-created auxiliary"
+worktree_disposition: "active | integration-ready | cleanup-ready | removed | preserved | host-managed"
 last_updated: "YYYY-MM-DDTHH:MM:SSZ"
 
 objective: >-
@@ -95,6 +98,9 @@ notes: >-
 - Keep the record current while the work remains active.
 - Use repository-relative paths whenever possible.
 - Keep `session_name` aligned with the naming standard for newly created sessions.
+- Keep task-created auxiliary ownership, integration target, cleanup condition, and final disposition aligned with `references/worktrees.md`.
+- Do not create one worktree per subagent. Only the owning root may authorize `isolation: worktree`, create, adopt, repurpose, move, or remove an auxiliary.
+- Before task completion, mark every task-created auxiliary `removed` with verification or `preserved` with its exact blocker and next action. Do not defer cleanup to scheduled automation.
 - Detect the repository's actual default branch instead of assuming `main` or `master`.
 - Do not store credentials, tokens, private local paths, or sensitive access material.
 - Do not paste full session transcripts, long logs, or unrelated implementation notes.

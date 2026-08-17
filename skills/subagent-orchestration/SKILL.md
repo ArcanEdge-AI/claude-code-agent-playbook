@@ -1,96 +1,94 @@
 ---
 name: subagent-orchestration
-description: Use when a coding task may benefit from Claude Code subagents for codebase exploration, review, docs research, test triage, or isolated implementation. Enforces dependency-aware decomposition, task-sized model, effort, and permission routing, bounded delegation, and main-session verification.
+description: Use when a coding task needs Claude Code subagents for bounded execution, local orchestration, exploration, review, docs research, test triage, or implementation. Enforces a finite root manifest, two delegated generations, root permits, task-sized model and capability ceilings, shared-workspace defaults, and root verification.
 ---
 
-# Subagent Orchestration Skill
+# Subagent Orchestration
 
-The main Claude Code session is the senior developer and orchestrator. Subagents assist but do not own the outcome.
+The root Claude Code session owns root topology, permits, budgets, worktree lifecycle, integration, and final acceptance. Subagents perform bounded execution.
 
-Use this skill when:
+Use this skill for complex, multi-file, risky, ambiguous, read-heavy, validation-heavy, or safely isolated implementation work. Use `multi-session-coordination` instead when independent Claude Code sessions already own related project work.
 
-- the task is complex, multi-file, risky, or ambiguous
-- independent read-heavy exploration would help
-- review from another perspective would improve quality
-- documentation or external API behavior needs verification
-- logs, tests, or large files need focused analysis
-- a small isolated implementation can be delegated safely
+Keep a simple bounded task as one direct-worker node. Do not create hierarchy when one worker can complete the subset reliably.
 
-Do not use this skill when:
+## Finite Dependency-Aware Delegation
 
-- the task is trivial
-- one coherent design judgment is required
-- requirements are materially unclear
-- subagents would edit the same files
-- the main session cannot verify the result
-- multiple independent Claude Code sessions are already implementing related work
+Before dispatch, the root records a finite manifest and total subagent budget. Each node declares:
 
-When multiple independent project sessions need discovery, conflict detection, ownership, sequencing, or integration guidance, use the `multi-session-coordination` skill instead. Do not spawn additional implementation subagents merely to solve an existing session-coordination conflict.
+- node, parent, and child IDs
+- root-issued permit
+- non-empty completion subset strictly smaller than its parent's remaining subset
+- goal, inputs, output, and acceptance condition
+- only real blocking dependencies
+- read scope or disjoint write ownership
+- named Claude Code agent, explicit per-invocation model, and selected definition-level effort at or below parent ceilings
+- `permissionMode` and exact tools equal to or narrower than the parent boundary
+- exact workspace and separate worktree permit when applicable
+- verification gate
 
-## Dependency-Aware Delegation
+Dispatch only ready manifest nodes with remaining budget and runtime, safety, permission, and ownership capacity. Runtime-full is backpressure. Do not create speculative descendants.
 
-Keep simple tasks simple. For work with multiple delegable parts, define each candidate work node with:
+A dependency exists only when a node cannot begin correctly without an accepted upstream artifact or decision. Serialize overlapping writers unless root-authorized isolation is verified. Preserve accepted outputs after unrelated failures and invalidate only downstream work that consumed rejected output.
 
-- a node identifier
-- one bounded goal
-- inputs and authoritative sources
-- an output and acceptance condition
-- only the upstream nodes that block it from starting
-- write ownership or read scope
-- a verification gate proportionate to risk
+## Two Delegated Generations
 
-A dependency exists only when a node cannot correctly begin without an accepted upstream artifact or decision. Identify which nodes are safe to run in parallel and which remaining chain of blocking work controls completion.
+Depth 0 is the root session. Depth 1 contains named direct workers or `local-orchestrator`. Depth 2 contains execution leaves that omit `Agent` and cannot spawn. Depth 3 is prohibited.
 
-Run independent nodes concurrently only when the runtime can isolate them, their writes and mutable state do not conflict, and the coordination cost is justified. State a concurrency limit and rationale instead of assuming unlimited fan-out. Serialize overlapping writers unless verified isolation is available. Treat `isolation: worktree` as safe only when the assignment's required base state is explicit and the isolated worktree is confirmed to start from that state.
+Only the root issues permits or expands the total budget. A `local-orchestrator` may use `Agent` only for root-permitted depth-2 leaves already in the manifest. Every child must remain equal to or narrower than its parent in inputs, data access, model, effort, permissions, tools, scope, non-goals, workspace, authority, and approval boundary. Equal-tier model and effort routes are valid; depth does not force a drop. Sibling write ownership must be disjoint.
 
-While delegated work is running, continue available independent, non-conflicting planning, inspection, integration, or validation work in the main session. Do not wait solely for a subagent when useful work remains. Do not invent parallel work, exceed runtime limits, broaden permission modes, or trade evidence and verification for lower latency.
+Before a local orchestrator uses `Agent`, nested subagents must be supported and `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=2` must already be active in an authorized settings scope and verified. If either gate is unavailable or unknown, depth 1 executes directly without `Agent` or reports upward. Do not emulate depth 2 with independent sessions or change the setting without authorization.
 
-## Mandatory Model, Effort, and Permission Routing
+Retries reuse their node ID, permit, and compatible workspace. Replacements require a new root permit and budget. Descendants cannot request or perform a stronger model, higher effort, broader permissions, more tools, expanded scope, greater authority, or worktree isolation.
 
-Before spawning a subagent, consult `references/model-routing.md` when available.
+## Model, Effort, Permission, and Tool Routing
 
-- Explicitly select a custom subagent or per-invocation model for every delegated task.
-- Do not rely on the default `inherit` behavior for routine subagent work.
-- Use the smallest Claude model and lowest effort likely to complete the bounded task reliably.
-- Use `plan` permission mode for read-only exploration, documentation research, and review.
-- Use `default` permission mode for bundled write-capable roles so normal approval prompts remain active.
-- Treat each profile's `tools` field as an allowlist.
-- Prefer Haiku with low effort for read-only exploration and focused documentation lookup.
-- Prefer Sonnet with medium effort for bounded implementation and test triage.
-- Prefer Sonnet with high effort for meaningful review.
-- Keep architecture, security-sensitive judgment, destructive operations, migrations, complex concurrency, and other high-impact decisions with the main session unless Opus, higher effort, or broader permissions are explicitly justified.
-- Do not enable bundled `acceptEdits`, `auto`, `dontAsk`, or `bypassPermissions` modes without maintainer-approved risk analysis.
-- Do not force `isolation: worktree` globally; decide isolation from the assignment's required base state.
-- A subagent must stop and report a capability gap. It must not silently change its model, effort, permission mode, tools, or isolation behavior, or fall back to inherited settings.
-- If a stronger model, higher effort, broader permission mode, or worktree isolation is selected, record why the configured profile is insufficient and how the result will be independently verified.
+Consult `references/model-routing.md` before dispatch.
+
+- Use explicit root-permitted named-agent routes; reject automatic delegation and do not rely on `inherit` for routine work.
+- Record the actual user-selected root model and rank; never assume Opus because it is available.
+- Use Opus rank 3, Sonnet rank 2, and Haiku rank 1. Require `child rank <= parent rank`; equal rank is valid.
+- Prefer Haiku / low for focused exploration and documentation lookup.
+- Prefer Sonnet / medium for bounded implementation and test triage.
+- Prefer Sonnet / high for meaningful review and local orchestration.
+- With an Opus root, normally use Sonnet or Haiku; use an Opus child only for an exceptional bounded assignment with a recorded reason and verification plan. A Sonnet root may use Sonnet or Haiku. A Haiku root may use Haiku only.
+- Pass the intended model explicitly on every `Agent` invocation; all bundled frontmatter models fail closed at Haiku and are not execution authority.
+- Effort is fixed by the selected agent definition; do not claim a per-invocation effort override. Keep both the effective child model tier and effort at or below the parent ceilings.
+- Use `plan` for read-only work and `default` for bundled write-capable roles.
+- Treat `tools` as an allowlist. Only `local-orchestrator` includes `Agent`.
+- Do not use bundled `acceptEdits`, `auto`, `dontAsk`, or `bypassPermissions` without approved risk analysis.
+- Treat an environment override, allowlist or provider substitution, resumed-route change, unknown alias, or unavailable model as a failed routing gate. Use the exact known parent family only when the runtime can explicitly enforce and verify it; otherwise keep the work with the parent or report the limitation.
+- A descendant preserves completed work and stops when its ceiling is insufficient; it does not request an upgrade. Only the root may route a new depth-1 replacement at any approved tier within the actual root ceiling, including a tier stronger than the failed child, with a new permit, budget, reason, and verification plan.
+
+## Shared Workspace and Worktree Budget
+
+Start in the current shared workspace with an auxiliary-worktree budget of zero. Only the root may raise the budget, issue a separate worktree permit, authorize `isolation: worktree`, create or adopt an auxiliary, change its purpose, move it, or remove it.
+
+The root may authorize one active auxiliary without additional approval; two or more require user approval for the exact count and reasons. Descendants use only their assigned workspace and do not set isolation on child calls. Reuse compatible worktrees for retries.
+
+Before the final response, the root integrates and removes every task-created auxiliary under `references/worktrees.md` or preserves it with exact path, owner, branch or HEAD, blocker, and next action. Do not defer task-owned cleanup to scheduled automation. Keep the active host-managed worktree under the host lifecycle.
 
 ## Workflow
 
-1. Clarify the task goal and success criteria.
-2. For multi-node work, map bounded nodes, real blocking dependencies, parallel-safe nodes, the completion-controlling path, and required handoff gates.
-3. Decide which work, if any, should be delegated and whether parallel execution creates real leverage.
-4. Choose from the Claude Code roles: Read-Only Explorer, Senior Reviewer, Docs Researcher, Test Triager, and Isolated Worker.
-5. Select the smallest suitable custom profile or per-invocation Claude model, effort, permission mode, and tool boundary.
-6. Give each subagent a precise assignment:
-   - role
-   - goal
-   - context
-   - selected profile or model
-   - effort level
-   - permission mode
-   - tool boundary
-   - why it is the smallest suitable choice
-   - escalation conditions
-   - scope
-   - non-goals
-   - required evidence
-   - output format
-   - for multi-node work, the node identifier, inputs, output and acceptance condition, blocking dependencies, ownership or read scope, and verification gate
-7. Launch only parallel-safe nodes concurrently and keep write-heavy work sequential unless isolation is verified.
-8. Verify subagent claims against primary evidence. For meaningful implementation, use a separate verification task with only the necessary artifact, criteria, and evidence requirements when the runtime supports it; the main session still decides acceptance.
-9. If a gate fails, revise or rerun the failed node and any downstream nodes whose inputs became invalid. Do not restart unrelated nodes by default.
-10. Before combining results, confirm every required input passed its designated gate, then inspect the combined diff and run validation for the integrated behavior.
-11. Accept, reject, revise, or rerun with stronger settings only when justified.
-12. Report relevant subagent usage, concurrency decisions, and any escalation in the final response.
+1. Clarify the goal, success criteria, active instructions, actual root model and rank, and root task ceiling.
+2. Map bounded nodes, real dependencies, parallel-safe ownership, and the completion-controlling path.
+3. Record the finite manifest, total subagent budget, permits, exact workspaces, and any root direct-execution exception.
+4. Select Local Orchestrator, Read-Only Explorer, Docs Researcher, Test Triager, Isolated Worker, or Senior Reviewer.
+5. Route an explicit per-invocation model and select a definition whose fixed effort, permission mode, and tools fit the parent ceilings.
+6. Give each subagent a precise assignment containing:
+   - role, goal, context, scope, and non-goals
+   - parent and child IDs, root permit, strict subset, and total-budget status
+   - inherited model, effort, permission, tool, workspace, scope, authority, and approval ceilings
+   - sibling ownership non-overlap
+   - output and acceptance condition
+   - required primary evidence and validation
+   - escalation and stop conditions
+   - compact parent return bundle
+7. Launch only ready permitted nodes with remaining budget and runtime capacity.
+8. Verify returned claims against primary evidence. Use a separate verifier when risk warrants it.
+9. Retry failed nodes with the same ID and permit; invalidate only dependent work whose inputs changed.
+10. Fan in only accepted inputs, then inspect the combined diff and validate integrated behavior.
+11. Accept, reject, or revise within existing ceilings. Only the root may create a replacement, and it may be stronger than the failed child only while remaining within the actual root ceiling.
+12. Reconcile every task-created auxiliary worktree before the final response.
+13. Report permit and budget use, subagent work, validation, and workspace dispositions.
 
-Never accept a subagent's conclusion solely because it sounds confident.
+Never accept a subagent conclusion solely because it sounds confident.

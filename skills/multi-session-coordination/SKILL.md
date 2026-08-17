@@ -5,7 +5,7 @@ description: Use when multiple independent Claude Code sessions are working on r
 
 # Multi-Session Coordination Skill
 
-The main Claude Code session is the integration coordinator. Independent sessions may contribute work, but the coordinating session owns architecture, compatibility decisions, sequencing, validation, and the final report.
+The root Claude Code session is the integration coordinator. Independent sessions may contribute work, but the coordinating root owns architecture, compatibility decisions, sequencing, validation, and the final report.
 
 Use this skill when:
 
@@ -25,6 +25,7 @@ Do not use this skill when:
 - available evidence is too incomplete to compare the work meaningfully
 
 Consult `references/multi-session-coordination.md` for the detailed coordination rules.
+Consult `references/worktrees.md` when any participating task proposes, owns, integrates, or cleans an auxiliary worktree.
 
 ## Session Naming
 
@@ -60,6 +61,8 @@ Identify the current:
 - resolved Claude Code home when session-history inspection is needed and permitted
 
 Do not ask the user for values that can be detected reliably from the environment or repository.
+
+Classify relevant checkouts as host-managed primary, user-managed existing, or task-created auxiliary. Record exact ownership and permits when known. Never infer cleanup authority from age, inactivity, or clean status.
 
 ### 2. Discover active sessions and work
 
@@ -114,6 +117,7 @@ For each relevant work item, capture:
 - unmet upstream dependencies and other blockers
 - open decisions
 - integration status
+- worktree lifecycle status and final disposition when task-created
 
 Separate confirmed facts from inference.
 
@@ -194,6 +198,8 @@ Require validation appropriate to the combined blast radius, including when rele
 - final combined diff review
 
 The coordinating session must inspect the combined result before declaring the work compatible.
+
+The owning root must also reconcile every task-created auxiliary before its final response: remove it after verified integration and cleanup gates, or preserve it with exact ownership and blocker evidence. Do not defer task-owned cleanup to scheduled automation, and do not remove host-managed, user-managed, or another session's worktree.
 
 ## Output Format
 
