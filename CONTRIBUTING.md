@@ -24,6 +24,7 @@ Avoid adding:
 - local machine quirks
 - internal URLs
 - sensitive access material
+- full session transcripts
 - long incident logs
 - instructions tied to one tool unless the file is explicitly an example
 
@@ -34,6 +35,7 @@ Avoid adding:
 - Prefer behavior and decision rules over rigid command sequences.
 - Use examples that are generic and safe for public reuse.
 - Keep the root-session orchestration, actual-root-model ceiling, bounded hierarchy, permit, capability-ceiling, and task-local worktree lifecycle model intact.
+- Compare generic policy changes with the companion Codex playbook. Align shared behavior or document the concrete harness capability that requires a difference.
 
 ## Pull Request Checklist
 
@@ -46,8 +48,9 @@ Before opening a PR:
 - Confirm read-only roles use `permissionMode: plan` and exclude `Edit` and `Write`; only `local-orchestrator.md` lists `Agent`; no bundled agent sets `isolation: worktree` globally.
 - Confirm every managed agent defaults to Haiku, the actual root model is the ceiling, accepted routes are explicit and root-permitted, child rank never exceeds parent rank, effort is definition-level, equal-tier routes remain valid, only the root may route replacements, and no model substitution is accepted silently.
 - Confirm Unix shell scripts remain LF-only.
+- Confirm generic policy changes were compared with the companion Codex playbook and any intentional divergence names its harness-specific reason.
 - Confirm no sensitive or private material was added.
 
 ## License Note
 
-This project is MIT licensed (see `LICENSE`). Contributions are accepted under the same license.
+By contributing to this repository, you agree that your contribution will be licensed under the MIT License. See `LICENSE`. Do not change the license without an explicit maintainer decision.

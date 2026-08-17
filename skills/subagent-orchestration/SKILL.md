@@ -40,6 +40,8 @@ Before a local orchestrator uses `Agent`, nested subagents must be supported and
 
 Retries reuse their node ID, permit, and compatible workspace. Replacements require a new root permit and budget. Descendants cannot request or perform a stronger model, higher effort, broader permissions, more tools, expanded scope, greater authority, or worktree isolation.
 
+Keep payloads to minimum paths and accepted artifacts; reuse accepted outputs, avoid duplicate discovery, and omit full history, transcripts, and long logs.
+
 ## Model, Effort, Permission, and Tool Routing
 
 Consult `references/model-routing.md` before dispatch.

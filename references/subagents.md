@@ -71,6 +71,8 @@ When a descendant reports that its ceiling is insufficient, only the root may ro
 
 `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=2` is a required capability gate for local orchestration, not an optional hardening measure. It must already be active in an authorized settings scope and verified before a depth-1 local orchestrator may spawn. The root does not install or change it without authorization. It reinforces but does not replace the instruction contract.
 
+Keep local delegation economical: send only the minimum relevant paths and accepted artifacts; reuse accepted results; avoid duplicate discovery; choose the smallest suitable model and effort; and omit full history, transcripts, and long logs.
+
 ## Worktrees Are Not Delegation Units
 
 Start in the current workspace with an auxiliary-worktree budget of zero. Read-only agents and disjoint writers normally share it. Serialize overlapping writes unless concrete branch or filesystem isolation makes an auxiliary checkout necessary.

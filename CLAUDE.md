@@ -26,6 +26,7 @@ Repository-specific guidance overrides the global instructions where it is more 
 - Do not copy configuration paths, file names, agent formats, model identifiers, or command vocabulary from another coding-agent environment into this repository.
 - Prefer terms like "safety", "access control", and "sensitive access material" when public documentation does not need product-specific terminology.
 - Keep templates reusable and clearly marked as templates.
+- Keep generic behavioral policy aligned with the companion Codex playbook. When a difference is intentional, document the concrete harness capability that requires it instead of preserving unexplained drift.
 
 ## Validation
 
@@ -44,6 +45,7 @@ This repo is mostly Markdown, with a small set of YAML frontmatter blocks in ski
 - Confirm install docs and scripts reference the current Claude Code subagent files.
 - Confirm installer validation lists include `references/worktrees.md`, `references/templates/worktree-manifest.md`, `skills/worktree-lifecycle/SKILL.md`, and `agents/local-orchestrator.md`.
 - Confirm new Claude-specific guidance uses `CLAUDE.md`, the resolved Claude Code home, Markdown subagent definitions, Claude model aliases, effort levels, permission modes, Claude tool names, and Claude session commands where applicable.
+- Compare generic policy changes with the companion Codex playbook and either align them or record the concrete harness-specific reason for divergence.
 - Search the final diff for paths, schemas, model names, and commands that belong to another coding-agent environment; remove any accidental contamination before merging.
 
 ## License

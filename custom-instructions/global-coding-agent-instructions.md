@@ -124,6 +124,8 @@ A depth-1 direct worker executes its own subset. A depth-1 `local-orchestrator` 
 
 Retries reuse the same node ID, permit, and compatible workspace. A replacement consumes a new root permit and budget. A descendant that cannot finish within its Claude model, effort, permission, tool, scope, or authority ceiling preserves completed work, stops, and reports the exact gap; it cannot upgrade itself or request an upgrade. The root may route a new depth-1 replacement at any approved tier within the actual root ceiling, including a tier stronger than the failed child, only with a new permit, available budget, reason, and verification plan.
 
+Keep delegation economical: pass only necessary paths and accepted artifacts, reuse accepted results, avoid duplicate discovery, and do not transfer full history, transcripts, or long logs.
+
 ### Model Selection for Subagents
 
 When model selection is available, the orchestrator must right-size the model and effort for each delegated task. Record the main session's actual user-selected model before delegation; account availability does not make Opus the root ceiling.

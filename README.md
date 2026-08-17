@@ -15,6 +15,7 @@
 <p align="center">
   <a href="#install-with-one-prompt">Install</a> ·
   <a href="#quick-start">Quick Start</a> ·
+  <a href="#related-playbooks">Related Playbooks</a> ·
   <a href="#why-this-exists">Why This Exists</a> ·
   <a href="#whats-inside">What's Inside</a> ·
   <a href="#subagent-model">Subagent Model</a> ·
@@ -29,7 +30,14 @@
   <img src="https://img.shields.io/badge/Subagents-Orchestrated-00C2FF" alt="Subagents Orchestrated" />
   <img src="https://img.shields.io/badge/Sessions-Coordinated-4ECDC4" alt="Sessions Coordinated" />
   <img src="https://img.shields.io/badge/Instructions-Tool--Agnostic-8A5CFF" alt="Instructions Tool Agnostic" />
+  <a href="https://github.com/ArcanEdge-AI/codex-agent-playbook"><img src="https://img.shields.io/badge/Codex-Companion-D97706" alt="Codex companion playbook" /></a>
+  <img src="https://img.shields.io/badge/License-MIT-2ECC71" alt="MIT License" />
   <img src="https://img.shields.io/badge/Status-Active-2ECC71" alt="Status Active" />
+</p>
+
+<p align="center">
+  <strong>Using Codex instead?</strong>
+  <a href="https://github.com/ArcanEdge-AI/codex-agent-playbook">Open the Codex Agent Playbook</a>.
 </p>
 
 ---
@@ -111,6 +119,19 @@ references/templates/repository-CLAUDE.md
 ```
 
 Save it as `CLAUDE.md` at the project root, then fill in the actual build commands, test commands, architecture rules, generated-file rules, and release expectations for that repository.
+
+---
+
+## Related Playbooks
+
+This repository is the Claude Code-focused version of the playbook.
+
+| Agent environment | Repository | Use when |
+| --- | --- | --- |
+| Claude Code | `ArcanEdge-AI/claude-code-agent-playbook` | You want global Claude Code instructions, reference docs, skills, and subagent definitions. |
+| Codex | [`ArcanEdge-AI/codex-agent-playbook`](https://github.com/ArcanEdge-AI/codex-agent-playbook) | You want the companion setup tuned for Codex. |
+
+The philosophy is shared across both: the root agent acts as the senior engineer and orchestrator, subagents perform bounded evidence-backed execution, independent project sessions are coordinated explicitly, and final decisions stay with the root agent.
 
 ---
 
